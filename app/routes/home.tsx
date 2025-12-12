@@ -1,9 +1,6 @@
 import type { Route } from "./+types/home";
-import { Link } from "react-router";
 import Section from "../shared/section";
 import Header from "../shared/header";
-import { Welcome } from "../welcome/welcome";
-import type { TextBody } from "~/types/content";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -37,5 +34,8 @@ export default function Home() {
       title="Sponsori un atbalstītāji" 
       content={["Gravity Team", "LU Fonds"]}
     />
+    <form method="post">
+      <button type="submit">Test Action</button>
+    </form>
   </div>
 }

@@ -1,3 +1,11 @@
+# Kvalifikācijas darbs
+
+To migrate postgres, use:
+
+```bash
+prisma migrate dev --name init
+```
+
 # Welcome to React Router!
 
 A modern, production-ready template for building full-stack React applications using React Router.

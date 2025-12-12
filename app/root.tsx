@@ -23,6 +23,15 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+import { creator } from "~/db.server";
+import type { ActionFunctionArgs } from "react-router";
+
+export async function action({
+  request,
+}: ActionFunctionArgs) {
+  await creator()
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
