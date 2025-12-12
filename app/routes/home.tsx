@@ -16,6 +16,10 @@ export default function Home() {
   return <div>
     <Header />
     <Section
+      title="Jaunumi"
+      content={[]}
+    />
+    <Section
       title="Par sacensībām"
       content={[
         "Pasaules studentu programmēšanas sacensības (ACM ICPC) ir senākās un prestižākās akadēmiskās programmēšanas sacensības pasaulē, kurās piedalās studenti.",

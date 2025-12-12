@@ -3,7 +3,7 @@ import Header from "~/shared/header";
 export default function News() {
     return <div>
         <Header />
-        <div> Jaunumi </div>
+        <div className="m-8 font-bold text-2xl"> Ziņas </div>
         <ArticleLink title="LU programmētāji iegūst sudrabu ICPC pusfinālā" date="12/12/2025"/>
         <ArticleLink title="LU programmētāji iegūst bronzu ICPC pusfinālā" date="12/12/2023"/>
         <ArticleLink title="LU programmētāji iegūst sudrabu ICPC pusfinālā" date="12/12/2025"/>

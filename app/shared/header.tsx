@@ -10,7 +10,7 @@ export default function Header(){
                 Par sacensībām
             </Link>
             <Link to="/news">
-                Jaunumi
+                Ziņas
             </Link>
             <div>
                 Piesakies!
