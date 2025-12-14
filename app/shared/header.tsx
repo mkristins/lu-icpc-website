@@ -15,9 +15,9 @@ export default function Header(){
             <div>
                 Piesakies!
             </div>
-            <div>
+            <Link to="/halloffame">
                 Panākumi
-            </div>
+            </Link>
             <Link to="/archive">
                 Arhīvs
             </Link>
