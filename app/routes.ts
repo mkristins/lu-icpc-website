@@ -3,7 +3,7 @@ import { type RouteConfig, index, prefix, route } from "@react-router/dev/routes
 export default [
     index("routes/home.tsx"),
     route("archive", "./routes/archive.tsx"),
-    route("news", "./routes/news/home.tsx"),
+    route("news", "./routes/news/news.tsx"),
     route("news/:id", "./routes/news/article.tsx"),
     // ...prefix("news", [
     //     index("./routes/news/home.tsx"),
