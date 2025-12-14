@@ -22,7 +22,7 @@ export default function News({loaderData} : Route.ComponentProps) {
         <div className="m-8 font-bold text-2xl"> Ziņas </div>
         {
             loaderData.map((article) => {
-                return <ArticleLink title={article.title} date="12/12/2025"/>
+                return <ArticleLink key={article.id} title={article.title} date="12/12/2025" articleId={article.id}/>
             })
         }
     </div>;

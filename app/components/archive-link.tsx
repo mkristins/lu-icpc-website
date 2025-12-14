@@ -4,14 +4,11 @@ export default function ArchiveLink({year, taskLink, resultLink, testLink} : {ye
         <div className="ml-8 mr-8 font-bold text-xl">
             {year}
         </div>
-        <Link className="ml-8 mr-8" to={taskLink}>
+        <Link className="ml-8 mr-8" to={taskLink} target="_blank">
             Uzdevumi
         </Link>
         <Link className="ml-8 mr-8" to={resultLink}>
             Rezultāti
-        </Link>
-        <Link className="ml-8 mr-8" to={testLink}>
-            Testi
         </Link>
     </div>
 }

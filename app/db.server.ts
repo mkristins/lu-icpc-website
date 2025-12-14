@@ -15,7 +15,6 @@ const data: Prisma.NewsArticleCreateInput[] = [
 ]
 
 export async function creator() {
-    console.log("Server action")
     for (const u of data) {
         await prisma.newsArticle.create({ data: u });
     }
@@ -23,7 +22,6 @@ export async function creator() {
 
 export async function fetchAllNewsArticles() {
     let articles = await prisma.newsArticle.findMany()
-    console.log(articles)
     return articles
 }
 

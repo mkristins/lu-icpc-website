@@ -2,8 +2,16 @@ import Header from "~/shared/header";
 export default function HallOfFame() {
   return <div>
     <Header />
-    <div className="m-8 font-bold text-2xl">
-        Hall of Fame
+    <div className="flex justify-center m-8">
+      <div className="m-4">
+        Komandas
+      </div>
+      <div className="m-4">
+        Dalībnieki
+      </div>
+      <div className="m-4">
+        Staptautiskās sacensības
+      </div>
     </div>
   </div>;
 }
