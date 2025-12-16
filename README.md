@@ -6,6 +6,11 @@ To migrate postgres, use:
 prisma migrate dev --name init
 ```
 
+To cleanup database, use:
+```bash
+npx prisma db push --force-reset && npx prisma db seed
+```
+
 # Welcome to React Router!
 
 A modern, production-ready template for building full-stack React applications using React Router.

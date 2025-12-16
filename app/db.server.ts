@@ -33,3 +33,17 @@ export async function fetchNewsArticle(id: string) {
     })
     return article
 }
+
+export async function fetchAllContests(){
+    let contests = await prisma.contest.findMany()
+    return contests
+}
+
+export async function fetchContest(id : string){
+    let contest = await prisma.contest.findUnique({
+        where : {
+            id : parseInt(id)
+        }
+    })
+    return contest
+}

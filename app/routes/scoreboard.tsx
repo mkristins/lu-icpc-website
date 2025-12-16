@@ -1,13 +1,24 @@
-export default function Scoreboard() {
+import { fetchContest } from "~/db.server"
+import type { Route } from "./+types/scoreboard"
+
+export async function loader({params} : Route.LoaderArgs){
+    const contestId = params.id
+    let contest = await fetchContest(contestId)
+    return contest
+}
+
+
+export default function Scoreboard({loaderData} : Route.ComponentProps) {
     const taskIdentifiers = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"]
     const row = ["ok", "ok", "wa", "wa", "ok", "ok", "wa", "wa","ok", "ok", "wa", "wa","meh"]
     const row2 = ["ok", "wa", "wa", "yes", "re", "ok", "wa", "wa","ok", "ok", "wa", "wa","meh"]
     const teamnames = ["Team 1", "Team 2"]
     const points = [9, 7]
     const penalties = [1111, 888]
+    const contestYear = loaderData?.year
     return <div>
         <div className="m-8 font-bold text-2xl">
-            Rezultātu tabula
+            Rezultātu tabula {contestYear}
             <table className="min-w-full border border-gray-300">
                 <thead className="bg-black">
                     <tr>
