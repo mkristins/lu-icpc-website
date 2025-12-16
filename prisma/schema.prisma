@@ -14,22 +14,55 @@ datasource db {
 }
 
 model AdminUser {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  name     String
   username String
 }
 
 model NewsArticle {
-  id Int @id @default(autoincrement())
+  id    Int    @id @default(autoincrement())
   title String
-  text String
+  text  String
 }
 
 model Contest {
+  id    Int           @id @default(autoincrement())
+  year  Int
+  from  DateTime
+  to    DateTime
+  tasks ContestTask[]
+  submissions  ContestSubmission[]
+  teams Team[]
+}
+ 
+model ContestTask {
+  id         Int     @id @default(autoincrement())
+  identifier String
+  contest    Contest @relation(fields: [contestId], references: [id])
+  contestId  Int
+}
+
+model Team {
+  id          Int          @id @default(autoincrement())
+  name        String
+  contestants Contestant[]
+  submissions ContestSubmission[]
+  contests Contest[]
+}
+
+model ContestSubmission {
   id Int @id @default(autoincrement())
-  year Int
-  from DateTime
-  to DateTime
-  taskIdentifiers String[]
+  submissionTime Int
+
+  team Team @relation(fields: [teamId], references: [id])
+  contest Contest @relation(fields: [contestId], references: [id])
+  teamId Int
+  contestId Int
+}
+
+model Contestant {
+  id     Int  @id @default(autoincrement())
+  team   Team @relation(fields: [teamId], references: [id])
+  teamId Int
 }
