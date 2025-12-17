@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-export default function ArchiveLink({year, taskLink, resultLink, testLink} : {year : string, taskLink : string, resultLink : string, testLink : string}){
+export default function ArchiveLink({year, taskLink, resultLink} : {year : number, taskLink : string, resultLink : string}){
     return <div className="m-8 flex flex-row justify-between">
         <div className="ml-8 mr-8 font-bold text-xl">
             {year}

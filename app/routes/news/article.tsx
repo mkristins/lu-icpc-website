@@ -2,6 +2,8 @@ import Header from "~/shared/header";
 import type { Route } from "./+types/article";
 import { creator, fetchNewsArticle } from "~/db.server";
 import { useLoaderData, type ActionFunctionArgs } from "react-router";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
 export async function loader({params} : Route.LoaderArgs){
     let article = await fetchNewsArticle(params.id)
@@ -18,6 +20,11 @@ export async function action({
 
 
 export default function Article({loaderData} : Route.ComponentProps){
+    const editor = useEditor({
+        extensions: [StarterKit],
+        content: "<p>Hello Tiptap!</p>",
+        immediatelyRender: false,
+    });
     if(!loaderData.article) {
         return <div>
             <Header />
@@ -28,5 +35,6 @@ export default function Article({loaderData} : Route.ComponentProps){
         <Header />
             <h1> {loaderData.article.title} </h1>
             <p> {loaderData.article.text} </p>
+            <EditorContent editor={editor} />
         </div>
 }

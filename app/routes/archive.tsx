@@ -20,8 +20,10 @@ export default function Archive({loaderData} : Route.ComponentProps) {
     <div className="m-8 font-bold text-2xl">
       Arhīvs
     </div>
-    <ArchiveLink year="2025" resultLink="./scoreboard/1" taskLink={link} testLink="/" />
-    <ArchiveLink year="2024" resultLink="./scoreboard/2" taskLink={link} testLink="/" />
-    <ArchiveLink year="2023" resultLink="./scoreboard/3" taskLink={link} testLink="/" />
+    {
+      loaderData.contests.map(contest => {
+        return <ArchiveLink year={contest.year} key={contest.id} resultLink={`./scoreboard/${contest.id}`} taskLink={link}/>
+      })
+    }
   </div>;
 }
