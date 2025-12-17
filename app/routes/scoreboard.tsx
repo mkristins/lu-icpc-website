@@ -1,5 +1,6 @@
 import { fetchContest } from "~/db.server"
 import type { Route } from "./+types/scoreboard"
+import Header from "~/shared/header"
 
 export async function loader({params} : Route.LoaderArgs){
     const contestId = params.id
@@ -9,13 +10,18 @@ export async function loader({params} : Route.LoaderArgs){
 
 
 export default function Scoreboard({loaderData} : Route.ComponentProps) {
-    const taskIdentifiers = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"]
-    const row = ["ok", "ok", "wa", "wa", "ok", "ok", "wa", "wa","ok", "ok", "wa", "wa","meh"]
-    const row2 = ["ok", "wa", "wa", "yes", "re", "ok", "wa", "wa","ok", "ok", "wa", "wa","meh"]
-    const teamnames = ["Team 1", "Team 2"]
+    if(!loaderData){
+        return <div>
+            <Header />
+            <div> LAPA NEEKSISTĒ </div>
+        </div>
+    }
     const points = [9, 7]
     const penalties = [1111, 888]
-    const contestYear = loaderData?.year
+    const contestYear = loaderData.year
+    const contestTasks = loaderData.tasks
+    const contestTeams = loaderData.teams
+
     return <div>
         <div className="m-8 font-bold text-2xl">
             Rezultātu tabula {contestYear}
@@ -23,12 +29,12 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                 <thead className="bg-black">
                     <tr>
                         <th className="border px-4 py-2 text-left font-semibold text-red-500"> Komanda </th>
-                        {taskIdentifiers.map((task) => (
+                        {contestTasks.map((task) => (
                             <th
-                                key={task}
+                                key={task.id}
                                 className="border px-4 py-2 text-left font-semibold text-red-500"
                             >
-                                {task}
+                                {task.identifier}
                             </th>
                         ))}
                         <th className="border px-4 py-2 text-left font-semibold text-red-500"> Punkti </th>
@@ -36,26 +42,23 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                     </tr>
                 </thead>
                 <tbody className="bg-gray-500">
-                    <tr>
-                        <td className="border px-4 py-2 text-left font-semibold text-red-500"> {teamnames[0]} </td>
-                        {
-                            row.map((r) => (
-                                <td className="border px-4 py-2 text-left font-semibold text-red-500"> {r} </td>
-                            ))
-                        }
-                        <td className="border px-4 py-2 text-left font-semibold text-red-500"> {points[0]} </td>
-                        <td className="border px-4 py-2 text-left font-semibold text-red-500"> {penalties[0]} </td>
-                    </tr>
-                    <tr>
-                        <td className="border px-4 py-2 text-left font-semibold text-red-500"> {teamnames[1]} </td>
-                        {
-                            row2.map((r) => (
-                                <td className="border px-4 py-2 text-left font-semibold text-red-500"> {r} </td>
-                            ))
-                        }
-                        <td className="border px-4 py-2 text-left font-semibold text-red-500"> {points[1]} </td>
-                        <td className="border px-4 py-2 text-left font-semibold text-red-500"> {penalties[1]} </td>
-                    </tr>
+                    {
+                        contestTeams.map((team) => {
+                            return <tr key={team.id}>
+                                <td className="border px-4 py-2 text-left font-semibold text-red-500"> {team.name} </td>
+                                {
+                                    contestTasks.map((task) => {
+                                        return <td key={task.id} 
+                                                className="border px-4 py-2 text-left font-semibold text-red-500">
+                                            AC
+                                        </td>
+                                    })
+                                }
+                                <td className="border px-4 py-2 text-left font-semibold text-red-500"> {points[0]} </td>
+                                <td className="border px-4 py-2 text-left font-semibold text-red-500"> {penalties[0]} </td>
+                            </tr>
+                        })
+                    }
                 </tbody>
             </table>
         </div>

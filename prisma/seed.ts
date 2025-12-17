@@ -52,6 +52,27 @@ async function main() {
     },
   })
 
+  const contest2025 = await prisma.contest.create({
+    data: {
+      year: 2025,
+      from: new Date("2025-06-01T09:00:00Z"),
+      to: new Date("2025-06-01T14:00:00Z"),
+      teams: {
+        connect: allTeams.map((team) => ({ id: team.id })),
+      },
+
+      tasks: {
+        create: [
+          { identifier: "A" },
+          { identifier: "B" },
+          { identifier: "C" },
+          { identifier: "D" },
+          { identifier: "E" },
+        ],
+      },
+    },
+  })
+
   // -------------------------
   // Submissions
   // -------------------------

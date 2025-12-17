@@ -43,7 +43,21 @@ export async function fetchContest(id : string){
     let contest = await prisma.contest.findUnique({
         where : {
             id : parseInt(id)
+        },
+        include : {
+            teams: true,
+            submissions: true,
+            tasks: true
         }
     })
     return contest
+}
+
+export async function fetchContestTasks(id : string) {
+    let contestTasks = await prisma.contestTask.findMany({
+        where : {
+            contestId: parseInt(id)
+        }
+    })
+    return contestTasks
 }
