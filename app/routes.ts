@@ -6,7 +6,7 @@ export default [
     route("archive/scoreboard/:id", "./routes/scoreboard.tsx"),
     route("news", "./routes/news/news.tsx"),
     route("news/:id", "./routes/news/article.tsx"),
-    route("private/admin", "./routes/admin/auth.tsx"),
+    route("private/admin", "./routes/admin/admin.tsx"),
     route("gallery", "./routes/gallery.tsx"),
     route("halloffame", "./routes/halloffame.tsx"),
 ] satisfies RouteConfig;

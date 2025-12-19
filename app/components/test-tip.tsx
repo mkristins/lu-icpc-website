@@ -4,7 +4,7 @@ import { TextStyleKit } from '@tiptap/extension-text-style'
 import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React from 'react'
+import React, { useState } from 'react'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -81,7 +81,17 @@ function MenuBar({ editor }: { editor: Editor }) {
   )
 }
 
+function SaveButton({onClick} : {onClick : () => void}){
+  return <button 
+    className="m-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8"
+    onClick={onClick}
+  >
+    Saglabāt!
+  </button>
+}
+
 export default function TestTip(){
+  const [isSaved, setIsSaved] = useState(true)
   const editor = useEditor({
     extensions,
     content: `<h2>
@@ -91,10 +101,19 @@ export default function TestTip(){
       console.log("Claim: Content changed")
       const html = editor.getHTML()
       console.log(html)
+      if(isSaved)
+        setIsSaved(false)
     } 
   })
+
+  function saveContent(){
+    setIsSaved(true)
+  }
+
   return (
     <div className="m-8">
+      <div>{isSaved ? "Ok" : "Not Ok"}</div>
+      <SaveButton onClick={saveContent}/>
       <MenuBar editor={editor} />
       <EditorContent className="m-2" editor={editor}/>
     </div>

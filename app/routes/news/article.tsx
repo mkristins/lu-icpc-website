@@ -180,10 +180,7 @@ export default function Article({loaderData} : Route.ComponentProps){
     if(editor)
     return <div>
         <Header />
-            <h1> {loaderData.article.title} </h1>
-            <p> {loaderData.article.text} </p>
             <TestTip />
-            
         </div>
     else
         return <div>Nav.</div>
