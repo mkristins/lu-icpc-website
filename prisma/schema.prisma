@@ -42,6 +42,7 @@ model ContestTask {
   identifier String
   contest    Contest @relation(fields: [contestId], references: [id])
   contestId  Int
+  submissions ContestSubmission[]
 }
 
 model Team {
@@ -58,8 +59,10 @@ model ContestSubmission {
 
   team Team @relation(fields: [teamId], references: [id])
   contest Contest @relation(fields: [contestId], references: [id])
+  task ContestTask @relation(fields: [taskId], references: [id])
   teamId Int
   contestId Int
+  taskId Int
 }
 
 model Contestant {

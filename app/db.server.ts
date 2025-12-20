@@ -2,6 +2,7 @@ import { PrismaClient } from "generated/prisma/client";
 import type { NewsArticle } from "generated/prisma/browser";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma } from "generated/prisma/client";
+import { parse } from "path";
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
 });
@@ -32,6 +33,17 @@ export async function fetchNewsArticle(id: string) {
         }
     })
     return article
+}
+
+export async function updateNewsArticle(id: string, newText : string){
+    await prisma.newsArticle.update({
+        where: {
+            id : parseInt(id)
+        },
+        data : {
+            text: newText
+        }
+    })
 }
 
 export async function fetchAllContests(){

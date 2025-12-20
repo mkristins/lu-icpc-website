@@ -12,9 +12,6 @@ export default function Header(){
             <Link to="/news">
                 Ziņas
             </Link>
-            <div>
-                Piesakies!
-            </div>
             <Link to="/halloffame">
                 Panākumi
             </Link>

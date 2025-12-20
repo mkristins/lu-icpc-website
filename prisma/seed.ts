@@ -32,8 +32,7 @@ async function main() {
   // -------------------------
   const articles = await prisma.newsArticle.createMany({
     data: [
-        { title: "Team 1 wins", text: "This was indeed an incredible feat of achievement"},
-        { title: "Team 2 wins", text: "This was indeed a narrow competition"},
+        { title: "Team 1 wins", text: '{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Hi there,\"}]},{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Hi meow, are you meow today?\"}]},{\"type\":\"paragraph\"}]}'},
     ]
   })
   // -------------------------
@@ -99,16 +98,19 @@ async function main() {
     data: [
       {
         teamId: allTeams[0].id,
+        taskId: 1,
         contestId: contest2024.id,
         submissionTime: 15,
       },
       {
         teamId: allTeams[0].id,
+        taskId: 2,
         contestId: contest2024.id,
         submissionTime: 32,
       },
       {
         teamId: allTeams[1].id,
+        taskId: 3,
         contestId: contest2024.id,
         submissionTime: 20,
       },

@@ -4,6 +4,7 @@ import type { NewsArticle } from "generated/prisma/browser";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma } from "generated/prisma/client";
 import jwt from "jsonwebtoken";
+import { parse } from "cookie";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -17,6 +18,22 @@ export function createToken(userId: string) {
   return jwt.sign({ userId }, JWT_SECRET, {
     expiresIn: "7d",
   });
+}
+
+export function verifyToken(token : string) {
+  return jwt.verify(token, JWT_SECRET)
+}
+
+export function isAuthorized(request : Request){
+  const cookies = parse(request.headers.get("Cookie") || "");
+  const token = cookies.token;
+
+  if(token && verifyToken(token)){
+      return true
+  }
+  else{
+      return false
+  }
 }
 
 export async function checkAdminAuth(username : string, password : string){

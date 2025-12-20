@@ -5,6 +5,7 @@ import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useState } from 'react'
+import { useFetcher } from 'react-router'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -81,41 +82,34 @@ function MenuBar({ editor }: { editor: Editor }) {
   )
 }
 
-function SaveButton({onClick} : {onClick : () => void}){
-  return <button 
-    className="m-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8"
-    onClick={onClick}
-  >
-    Saglabāt!
-  </button>
-}
-
-export default function TestTip(){
+export default function NewsEditor({articleId, articleJson} : {articleId : number, articleJson : string}){
+  const fetcher = useFetcher()
   const [isSaved, setIsSaved] = useState(true)
+  const [contentJson, setContentJson] = useState(articleJson)
   const editor = useEditor({
     extensions,
-    content: `<h2>
-      Hi there,
-    </h2> <h1> Hi meow</h1>`,
+    content: JSON.parse(articleJson),
     onUpdate({ editor} ) {
-      console.log("Claim: Content changed")
-      const html = editor.getHTML()
-      console.log(html)
       if(isSaved)
         setIsSaved(false)
-    } 
+      setContentJson(JSON.stringify(editor.getJSON()))
+    },
+    immediatelyRender: false 
   })
-
-  function saveContent(){
-    setIsSaved(true)
-  }
-
-  return (
-    <div className="m-8">
-      <div>{isSaved ? "Ok" : "Not Ok"}</div>
-      <SaveButton onClick={saveContent}/>
-      <MenuBar editor={editor} />
-      <EditorContent className="m-2" editor={editor}/>
+  if(!editor){
+    <div className='m-8'>
+      Lapa nelādējas.
     </div>
-  )
+  }
+  else{
+  return (
+      <fetcher.Form method="post" className='m-8'>
+        <button className="m-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8" type="submit"> Save </button>
+        <MenuBar editor={editor} />
+        <EditorContent className="m-2" editor={editor} />
+        <input type="hidden" name="contentJson" value={contentJson} />
+        <input type="hidden" name="articleId" value={articleId} />
+      </fetcher.Form>
+    )
+  }
 }

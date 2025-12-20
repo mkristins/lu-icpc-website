@@ -7,6 +7,7 @@ export default [
     route("news", "./routes/news/news.tsx"),
     route("news/:id", "./routes/news/article.tsx"),
     route("private/admin", "./routes/admin/admin.tsx"),
+    route("private/upload", "./routes/admin/upload.tsx"),
     route("gallery", "./routes/gallery.tsx"),
     route("halloffame", "./routes/halloffame.tsx"),
 ] satisfies RouteConfig;

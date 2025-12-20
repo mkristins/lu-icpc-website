@@ -1,6 +1,8 @@
 import type { Route } from "./+types/home";
 import Section from "../shared/section";
 import Header from "../shared/header";
+import { isAuthorized } from "~/auth.server";
+import AdminWrap from "~/components/admin-wrap";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,7 +11,13 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export async function loader({request} : {request : Request}) {
+  return {
+    isAdmin: isAuthorized(request)
+  }
+}
+
+export default function Home({loaderData} : Route.ComponentProps) {
   return <div>
     <Header />
     <Section
@@ -40,5 +48,13 @@ export default function Home() {
       title="Sponsori un atbalstītāji" 
       content={["Gravity Team", "LU Fonds"]}
     />
+    <AdminWrap isAdmin={loaderData.isAdmin}>
+      <Section 
+        title="Administrators!"
+        content={[
+          "Par un ap administratoriem"
+        ]}
+      />
+    </AdminWrap>
   </div>
 }
