@@ -29,12 +29,16 @@ model NewsArticle {
 
 model Contest {
   id    Int           @id @default(autoincrement())
+  name String
   year  Int
   from  DateTime
   to    DateTime
+  isLocal Boolean
+  pdfLink String?
   tasks ContestTask[]
   submissions  ContestSubmission[]
   teams Team[]
+  participations TeamParticipation[]
 }
  
 model ContestTask {
@@ -48,15 +52,32 @@ model ContestTask {
 model Team {
   id          Int          @id @default(autoincrement())
   name        String
+  official Boolean @default(true)
   contestants Contestant[]
   submissions ContestSubmission[]
   contests Contest[]
+  participations TeamParticipation[]
+  goldMedals Int @default(0)
+  silverMedals Int @default(0)
+  bronzeMedals Int  @default(0)
+}
+
+model TeamParticipation {
+  id Int @id @default(autoincrement())
+  solvedTasks Int
+  penalty Int
+  rank Int
+  medalIndex Int @default(0)
+  team Team @relation(fields: [teamId], references: [id])
+  contest Contest @relation(fields: [contestId], references: [id])
+  teamId Int
+  contestId Int
 }
 
 model ContestSubmission {
   id Int @id @default(autoincrement())
   submissionTime Int
-
+  isVerdictOk Boolean
   team Team @relation(fields: [teamId], references: [id])
   contest Contest @relation(fields: [contestId], references: [id])
   task ContestTask @relation(fields: [taskId], references: [id])
@@ -69,4 +90,17 @@ model Contestant {
   id     Int  @id @default(autoincrement())
   team   Team @relation(fields: [teamId], references: [id])
   teamId Int
+}
+
+model Album{
+  id Int @id @default(autoincrement())
+  title String
+  photos AlbumPhoto[]
+}
+
+model AlbumPhoto{
+  id Int @id @default(autoincrement())
+  album Album @relation(fields: [albumId], references: [id])
+  albumId Int
+  photoLink String
 }

@@ -25,14 +25,18 @@ export function verifyToken(token : string) {
 }
 
 export function isAuthorized(request : Request){
-  const cookies = parse(request.headers.get("Cookie") || "");
-  const token = cookies.token;
+  try{
+    const cookies = parse(request.headers.get("Cookie") || "");
+    const token = cookies.token;
 
-  if(token && verifyToken(token)){
-      return true
-  }
-  else{
-      return false
+    if(token && verifyToken(token)){
+        return true
+    }
+    else{
+        return false
+    }
+  } catch (err) {
+    return false
   }
 }
 

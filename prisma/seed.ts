@@ -1,6 +1,7 @@
 import { PrismaClient } from "generated/prisma/client"
 import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
+import { create } from "domain";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -56,6 +57,9 @@ async function main() {
       year: 2024,
       from: new Date("2024-06-01T09:00:00Z"),
       to: new Date("2024-06-01T14:00:00Z"),
+      name: "LU Atlase 2024",
+      isLocal: true,
+      pdfLink: "lupo-data/competition-archive/2010/euc2025-official.pdf",
       teams: {
         connect: allTeams.map((team) => ({ id: team.id })),
       },
@@ -75,6 +79,8 @@ async function main() {
       year: 2025,
       from: new Date("2025-06-01T09:00:00Z"),
       to: new Date("2025-06-01T14:00:00Z"),
+      name: "LU Atlase 2025",
+      isLocal: true,
       teams: {
         connect: allTeams.map((team) => ({ id: team.id })),
       },
@@ -101,21 +107,55 @@ async function main() {
         taskId: 1,
         contestId: contest2024.id,
         submissionTime: 15,
+        isVerdictOk: true,
       },
       {
         teamId: allTeams[0].id,
         taskId: 2,
         contestId: contest2024.id,
         submissionTime: 32,
+        isVerdictOk: false,
       },
       {
         teamId: allTeams[1].id,
         taskId: 3,
         contestId: contest2024.id,
         submissionTime: 20,
+        isVerdictOk: true,
       },
     ],
   })
+
+  // -------------
+  // Photos
+  // -------------
+  const album1 = await prisma.album.create({
+    data : {
+      title: "CERC 2025",
+      photos: {
+        create: [
+          {photoLink : "example/gallery/Main Album/csm_CERC_2025__5__9af5e6cb38.png"},
+          {photoLink : "example/gallery/Main Album/csm_CERC_2025__6__f8c554989a.png"},
+          {photoLink : "example/gallery/Main Album/csm_CERC_2025__7__3ef5eca4fa.png"}
+        ]
+      }
+    }
+  })  
+
+  const album2 = await prisma.album.create({
+    data : {
+      title: "CERC 2025 v2",
+      photos: {
+        create: [
+          {photoLink : "example/gallery/Second Album/csm_CERC_2025__2__b3e2278f17.png"},
+          {photoLink : "example/gallery/Second Album/csm_CERC_2025__3__8c486b5d05.png"},
+          {photoLink : "example/gallery/Second Album/csm_CERC_2025__4__08c3b1bae1.png"}
+        ]
+      }
+    }
+  })
+
+  //
 
   console.log("Seeding finished")
 }

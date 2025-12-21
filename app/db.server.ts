@@ -51,6 +51,11 @@ export async function fetchAllContests(){
     return contests
 }
 
+export async function fetchAllTeams(){
+    let teams = await prisma.team.findMany()
+    return teams
+}
+
 export async function fetchContest(id : string){
     let contest = await prisma.contest.findUnique({
         where : {
@@ -72,4 +77,9 @@ export async function fetchContestTasks(id : string) {
         }
     })
     return contestTasks
+}
+
+export async function fetchAlbums() {
+    let albums = await prisma.album.findMany()
+    return albums
 }
