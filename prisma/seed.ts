@@ -33,7 +33,7 @@ async function main() {
   // -------------------------
   const articles = await prisma.newsArticle.createMany({
     data: [
-        { title: "Team 1 wins", text: '{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"Hi there,\"}]},{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"Hi meow, are you meow today?\"}]},{\"type\":\"paragraph\"}]}'},
+        { title: "Team 1 wins", text: '{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"LU dalība CERC\"}]},{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"LU komandas CERC pusfinālā izcīna attiecīgi 7. un 35. vietu.\"}]},{\"type\":\"paragraph\"}]}'},
     ]
   })
   // -------------------------
@@ -45,6 +45,20 @@ async function main() {
       { name: "Bug Slayers" },
       { name: "Runtime Terror" },
     ],
+  })
+
+
+  const singleTeam = await prisma.team.create({
+    data : {
+      name: "Fake Coders",
+      contestants: {
+        create: [
+          {name: "Jānis Bērziņš"},
+          {name: "Alfrēds Bērziņš"},
+          {name: "Jānis Vītoliņš"}
+        ]
+      }
+    }
   })
 
   const allTeams = await prisma.team.findMany()

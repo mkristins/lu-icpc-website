@@ -2,10 +2,10 @@ import { Link } from "react-router";
 
 export default function Header(){
     return <div>
-        <div className="flex flex-row justify-center text-3xl font-bold m-10">
+        <div className="flex flex-row justify-center text-3xl font-bold mt-10">
             Latvijas Universitātes ICPC programmēšanas sacensības
         </div>
-        <div className="flex flex-row justify-center m-4 ml-12 mr-12">
+        <div className="flex flex-row justify-center ml-12 mr-12">
             <Link to="/" className="m-4">
                 Par sacensībām
             </Link>

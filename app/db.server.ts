@@ -47,13 +47,22 @@ export async function updateNewsArticle(id: string, newText : string){
 }
 
 export async function fetchAllContests(){
-    let contests = await prisma.contest.findMany()
+    let contests = await prisma.contest.findMany({
+        orderBy: {
+            year: 'desc'
+        }
+    })
     return contests
 }
 
 export async function fetchAllTeams(){
     let teams = await prisma.team.findMany()
     return teams
+}
+
+export async function fetchAllContestants(){
+    let contestants = await prisma.contestant.findMany()
+    return contestants
 }
 
 export async function fetchContest(id : string){
