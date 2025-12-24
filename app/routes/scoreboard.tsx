@@ -72,6 +72,31 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
     function teamSolvedProblems(teamId : number){
         return contestTasks.filter((task) => contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id && sub.isVerdictOk))).length
     }
+    function teamTotalPenalty(teamId : number){
+        return contestTasks.reduce((currentPenalty, task) => {
+            const firstSolveTime = contestSubmissions.reduce((currentSolveTime, submission) => {
+                if(submission.submissionTime <= elapsedTime && submission.teamId == teamId && submission.taskId == task.id && submission.isVerdictOk){
+                    if(currentSolveTime == -1 || submission.submissionTime <= currentSolveTime){
+                        return submission.submissionTime
+                    }
+                }
+                return currentSolveTime
+            }, -1)
+            if(firstSolveTime == -1){
+                return currentPenalty
+            }
+            const extraPenalty = contestSubmissions.reduce((currentExtraPenalty, submission) => {
+                if(submission.submissionTime <= firstSolveTime && submission.teamId == teamId && submission.taskId == task.id && !submission.isVerdictOk){
+                    return currentExtraPenalty + 20
+                }
+                else{
+                    return currentExtraPenalty
+                }
+            }, 0)
+
+            return currentPenalty + firstSolveTime + extraPenalty
+        }, 0)
+    }
     const [elapsedTime, setElapsedTime] = useState(300)
 
     return <div>
@@ -122,7 +147,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                                     })
                                 }
                                 <td className="border px-4 py-2 text-left font-semibold"> {teamSolvedProblems(team.id)} </td>
-                                <td className="border px-4 py-2 text-left font-semibold"> {penalties[0]} </td>
+                                <td className="border px-4 py-2 text-left font-semibold"> {teamTotalPenalty(team.id)} </td>
                             </tr>
                         })
                     }
