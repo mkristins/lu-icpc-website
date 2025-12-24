@@ -82,7 +82,7 @@ function MenuBar({ editor }: { editor: Editor }) {
   )
 }
 
-export default function NewsEditor({articleId, articleJson} : {articleId : number, articleJson : string}){
+export default function NewsEditor({articleId, articleJson, isEditable} : {articleId : number, articleJson : string, isEditable : boolean}){
   const fetcher = useFetcher()
   const [isSaved, setIsSaved] = useState(true)
   const [contentJson, setContentJson] = useState(articleJson)
@@ -94,10 +94,10 @@ export default function NewsEditor({articleId, articleJson} : {articleId : numbe
         setIsSaved(false)
       setContentJson(JSON.stringify(editor.getJSON()))
     },
-    immediatelyRender: false 
+    immediatelyRender: false,
+    editable: isEditable
   })
   function onClick(event : React.MouseEvent) {
-    console.log("submit?")
     setIsSaved(false)
   }
   if(!editor){
@@ -108,13 +108,19 @@ export default function NewsEditor({articleId, articleJson} : {articleId : numbe
   else{
   return (
     <div>
-      <fetcher.Form method="post" className='m-8'>
-        <button className="m-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8" onClick={onClick} type="submit"> Save </button>
-        <input type="hidden" name="contentJson" value={contentJson} />
-        <input type="hidden" name="articleId" value={articleId} />
-      </fetcher.Form>
+      {
+        isEditable &&
+        <fetcher.Form method="post" className='m-8'>
+          <button className="m-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8" onClick={onClick} type="submit"> Save </button>
+          <input type="hidden" name="contentJson" value={contentJson} />
+          <input type="hidden" name="articleId" value={articleId} />
+        </fetcher.Form>
+      }
       <div className='ml-8'>
-        <MenuBar editor={editor} />
+        {
+          isEditable &&
+          <MenuBar editor={editor} />
+        }
         <EditorContent className="m-2" editor={editor} />
       </div>
     </div>

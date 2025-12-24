@@ -1,7 +1,7 @@
 import Header from "~/shared/header";
-import type { Route } from "./+types/article";
+import type { Route } from "./+types/article-edit";
 import { fetchNewsArticle } from "~/db.server";
-import { useLoaderData, type ActionFunctionArgs } from "react-router";
+import { Link, redirect, useLoaderData, type ActionFunctionArgs } from "react-router";
 import { useEditor, useEditorState, EditorContent, Editor } from "@tiptap/react";
 import { TextStyleKit } from "@tiptap/extension-text-style"
 import StarterKit from "@tiptap/starter-kit";
@@ -9,12 +9,17 @@ import TestTip from "~/components/news-editor";
 import { useFetcher } from "react-router";
 import { updateNewsArticle } from "~/db.server";
 import NewsEditor from "~/components/news-editor";
+import { isAuthorized } from "~/auth.server";
 
-export async function loader({params} : Route.LoaderArgs){ 
+export async function loader({request, params} : Route.LoaderArgs){ 
+  const isAdmin = isAuthorized(request)
+  if(!isAdmin){
+    return redirect("/")
+  }
   let article = await fetchNewsArticle(params.id)
-    return {
-        article: article
-    }
+  return {
+      article: article
+  }
 }
 
 
@@ -36,7 +41,7 @@ export async function action({
 }
 
 
-export default function Article({loaderData} : Route.ComponentProps){
+export default function ArticleEdit({loaderData} : Route.ComponentProps){
     const fetcher = useFetcher()
     if(!loaderData.article) {
         return <div>
@@ -47,7 +52,10 @@ export default function Article({loaderData} : Route.ComponentProps){
     else{
       return <div>
             <Header />
-            <NewsEditor articleId={loaderData.article.id} articleJson={loaderData.article.text}/>
+            <Link to={`/news/${loaderData.article.id}`} className="font-bold text-blue-500 text-2xl m-8">
+              Apskatīt!
+            </Link>
+            <NewsEditor articleId={loaderData.article.id} articleJson={loaderData.article.text} isEditable={true}/>
           </div>
     }
 }
