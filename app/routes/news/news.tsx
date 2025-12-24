@@ -28,7 +28,7 @@ export default function News({loaderData} : Route.ComponentProps) {
         <div className="m-8 font-bold text-2xl"> Ziņas </div>
         <AdminWrap isAdmin={loaderData.isAdmin}>
             <div className="text-blue-500 font-bold text-2xl m-8">
-                Pievienot!
+                Jauna ziņa!
             </div>
         </AdminWrap>
         {

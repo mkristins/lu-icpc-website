@@ -10,5 +10,6 @@ export default [
     route("private/admin", "./routes/admin/admin.tsx"),
     route("private/upload", "./routes/admin/upload.tsx"),
     route("gallery", "./routes/gallery/album-list.tsx"),
+    route("gallery/upload", "./routes/gallery/album-upload.tsx"),
     route("halloffame", "./routes/halloffame.tsx"),
 ] satisfies RouteConfig;

@@ -3,6 +3,7 @@ import Header from "~/shared/header";
 import type { Route } from "./+types/album-list";
 import { isAuthorized } from "~/auth.server";
 import AdminWrap from "~/components/admin-wrap";
+import { Link } from "react-router";
 
 export async function loader({request} : Route.LoaderArgs) {
   let albums = await fetchAlbums()
@@ -20,9 +21,9 @@ export default function AlbumList({loaderData} : Route.ComponentProps) {
         Galerija
     </div>
     <AdminWrap isAdmin={loaderData.isAdmin}>
-      <div className="m-8 font-bold text-2xl text-blue-500">
+      <Link to="./upload" className="m-8 font-bold text-2xl text-blue-500">
         Pievienot fotoalbumu!
-      </div>
+      </Link>
     </AdminWrap>
     <div className="m-8 flex flex-col">
       {
