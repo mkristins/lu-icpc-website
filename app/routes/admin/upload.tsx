@@ -2,6 +2,7 @@ import { isAuthorized } from "~/auth.server";
 import { Form, redirect, useFetcher } from "react-router";
 import Header from "~/shared/header";
 import { fetchCodeforcesData } from "~/cf.server";
+import { useEffect, useState } from "react";
 
 export function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -33,7 +34,10 @@ export async function action({request} : {request : Request}){
         }
         // Load the data from codeforces
         const data = await fetchCodeforcesData(apiKey.trim(), apiSecret.trim(), contestId.trim())
-        console.log("CF loading triggered")
+        return {
+            success: true,
+            data: data
+        }
     }
 }
 
@@ -42,7 +46,38 @@ function InputComponent({name, placeholder} : {name : string, placeholder : stri
 }
 
 export default function UploadContest() {
+    function computeTeamList(fetchData){
+        if(!fetchData) return []
+        return fetchData.data.results.result.rows.map((res) => {
+            return {
+                rank : res.rank,
+                teamId : res.party.participantId,
+                solvedProblems : res.points,
+                penalty : res.penalty 
+            }
+        })
+    }
+    // we work with local id's
+    function computeSubmissionList(fetchData){
+        if(!fetchData || !fetchData.data) return []
+        console.log("special", fetchData)
+        return fetchData.data.submissions.result.map((sub) => {
+            return {
+                teamId : sub.author.participantId,
+                problemIndex : sub.problem.index,
+                verdict : sub.verdict == "OK"
+            }
+        })
+    }
     const fetcher = useFetcher()
+    console.log(fetcher.data)
+    const [teamList, setTeamList] = useState([])
+
+    const problemList = []
+    const submissionList = computeSubmissionList(fetcher.data)
+    useEffect(() => {
+        setTeamList(computeTeamList(fetcher.data))
+    }, [fetcher.data])
     return <div>
         <Header />
         <div className="m-8">

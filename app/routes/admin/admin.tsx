@@ -2,7 +2,14 @@ import { useState } from "react";
 import Header from "~/shared/header";
 import type { Route } from "./+types/admin";
 import { Form, redirect, type ActionFunctionArgs } from "react-router";
-import { checkAdminAuth, createToken } from "~/auth.server";
+import { checkAdminAuth, createToken, isAuthorized } from "~/auth.server";
+
+export function loader({request} : {request : Request}){
+    const isAdmin = isAuthorized(request)
+    if(isAdmin){
+        return redirect("/")
+    }
+}
 
 export async function action({request} : ActionFunctionArgs){
     const formData = await request.formData();

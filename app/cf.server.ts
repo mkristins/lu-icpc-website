@@ -29,5 +29,8 @@ export async function fetchCodeforcesData(apiKey : string, secret : string, cont
     const contestResults = await fetch(contestResultsUrl)
     const contestResultData = await contestResults.json()
 
-    return statusHash
+    return {
+      submissions: contestSubmissionData,
+      results: contestResultData
+    }
 }
