@@ -21,12 +21,12 @@ export default function Archive({loaderData} : Route.ComponentProps) {
   const link = `${STORAGE_URL}/competition-archive/2010/euc2025-official.pdf`
   return <div>
     <Header />
-    <div className="m-8 font-bold text-2xl">
+    <div className="mx-8 font-bold text-2xl">
       Arhīvs
     </div>
     <AdminWrap isAdmin={loaderData.isAdmin}>
       <Link 
-        className="m-8 font-bold text-2xl text-blue-500"
+        className="mx-8 font-bold text-2xl text-blue-500"
         to="/private/upload"
       >
         Pievienot sacensības

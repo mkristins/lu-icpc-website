@@ -17,11 +17,11 @@ export async function loader({request} : Route.LoaderArgs) {
 export default function AlbumList({loaderData} : Route.ComponentProps) {
   return <div>
     <Header />
-    <div className="m-8 font-bold text-2xl">
+    <div className="mx-8 font-bold text-2xl">
         Galerija
     </div>
     <AdminWrap isAdmin={loaderData.isAdmin}>
-      <Link to="./upload" className="m-8 font-bold text-2xl text-blue-500">
+      <Link to="./upload" className="mx-8 font-bold text-2xl text-blue-500">
         Pievienot fotoalbumu!
       </Link>
     </AdminWrap>

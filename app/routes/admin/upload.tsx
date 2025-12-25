@@ -38,6 +38,9 @@ export async function action({request} : {request : Request}){
         const data = await fetchCodeforcesData(apiKey.trim(), apiSecret.trim(), contestId.trim())
         return data
     }
+    else if(intent == "save"){
+        console.log("save to system")
+    }
 }
 
 function InputComponent({name, placeholder} : {name : string, placeholder : string}){
@@ -51,6 +54,15 @@ export default function UploadContest() {
             return {
                 rank : res.rank,
                 teamId: null,
+                member1: {
+                    name: "Member 1",
+                },
+                member2: {
+                    name: "Member 2"
+                },
+                member3: {
+                    name: "Member 3"
+                },
                 teamName: `LU-${res.party.participantId}`,
                 participantId : res.party.participantId,
                 solvedProblems : res.points,
@@ -80,6 +92,22 @@ export default function UploadContest() {
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
                 return {...team, teamName: event.target.value}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
+    function onTeamMemberChange(memberId : number, event : React.ChangeEvent<HTMLInputElement>){
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                if(memberId == 1)
+                    return {...team, member1: {name: event.target.value}}
+                else if(memberId == 2)
+                    return {...team, member2: {name: event.target.value}}
+                else
+                    return {...team, member3: {name: event.target.value}}
             }
             else{
                 return team
@@ -120,7 +148,7 @@ export default function UploadContest() {
                 <InputComponent name="codeforcesApiSecret" placeholder="Codeforces API noslēpums" /> 
                 <InputComponent name="codeforcesContestId" placeholder="Codeforces sacensību ID" /> 
                 <div>
-                    ⚠️ Uzmanību! Sistēma šīs atslēgas neuzglabā un izmanto tās tikai datu izguvei no Codeforces sistēmas.
+                    ⚠️ Uzmanību! Sistēma šīs atslēgas neuzglabā un izmanto tās tikai un vienīgi šo rezultātu izguvei no Codeforces sistēmas.
                 </div>
                 <button type="submit" name="_action" value="load" className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
                     Ielādēt no Codeforces!
@@ -143,16 +171,6 @@ export default function UploadContest() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td className="border px-3 py-2 text-left"> 1 </td>
-                        <td className="border px-3 py-2 text-left"> Skrupulozās zemenītes </td>
-                        <td className="border px-3 py-2 text-left"> Valters Kalniņš </td>
-                        <td className="border px-3 py-2 text-left"> Valters Kalniņš </td>
-                        <td className="border px-3 py-2 text-left"> Valters Kalniņš </td>
-                        <td className="border px-3 py-2 text-left"> 10 </td>
-                        <td className="border px-3 py-2 text-left"> 1025 </td>
-                        <td className="border px-3 py-2 text-left"> Jā! </td>
-                    </tr>
                     {
                         teamList.map((team) => {
                             return <tr key={team.participantId}>
@@ -164,9 +182,27 @@ export default function UploadContest() {
                                         onChange={onTeamNameChange}
                                     />
                                 </td>
-                                <td className="border px-3 py-2 text-left"> Test 1 </td>
-                                <td className="border px-3 py-2 text-left"> Test 2 </td>
-                                <td className="border px-3 py-2 text-left"> Test 3 </td>
+                                <td className="border px-3 py-2 text-left"> 
+                                    <input 
+                                        value={team.member1.name}
+                                        onFocus={() => setEditingId(team.participantId)}
+                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(1, e)}
+                                    />
+                                </td>
+                                <td className="border px-3 py-2 text-left">
+                                    <input 
+                                        value={team.member2.name}
+                                        onFocus={() => setEditingId(team.participantId)}
+                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(2, e)}
+                                    />
+                                </td>
+                                <td className="border px-3 py-2 text-left">
+                                    <input 
+                                        value={team.member3.name}
+                                        onFocus={() => setEditingId(team.participantId)}
+                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(3, e)}
+                                    />
+                                </td>
                                 <td className="border px-3 py-2 text-left"> {team.solvedProblems} </td>
                                 <td className="border px-3 py-2 text-left"> {team.penalty} </td>
                                 <td className="border px-3 py-2 text-left"> Nē! </td>
@@ -175,6 +211,9 @@ export default function UploadContest() {
                     }
                 </tbody>
             </table>
+            <button type="submit" name="_action" value="save" className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
+                Saglabāt sistēmā!
+            </button>
         </div>
     </div>
 }

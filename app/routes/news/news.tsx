@@ -25,9 +25,9 @@ export default function News({loaderData} : Route.ComponentProps) {
     }
     return <div>
         <Header />
-        <div className="m-8 font-bold text-2xl"> Ziņas </div>
+        <div className="mx-8 font-bold text-2xl"> Ziņas </div>
         <AdminWrap isAdmin={loaderData.isAdmin}>
-            <div className="text-blue-500 font-bold text-2xl m-8">
+            <div className="text-blue-500 font-bold text-2xl mx-8">
                 Jauna ziņa!
             </div>
         </AdminWrap>
