@@ -51,6 +51,7 @@ export default function UploadContest() {
             return {
                 rank : res.rank,
                 teamId: null,
+                teamName: `LU-${res.party.participantId}`,
                 participantId : res.party.participantId,
                 solvedProblems : res.points,
                 penalty : res.penalty 
@@ -60,7 +61,6 @@ export default function UploadContest() {
     // we work with local id's
     function computeSubmissionList(fetchData : CFAPIResponse){
         if(!fetchData) return []
-        console.log("special", fetchData)
         return fetchData.submissions.result.map((sub) => {
             return {
                 teamId : sub.author.participantId,
@@ -72,14 +72,26 @@ export default function UploadContest() {
     const fetcher = useFetcher()
     console.log(fetcher.data)
     const [teamList, setTeamList] = useState<UploadTeamData[]>([])
-
+    const [editingId, setEditingId] = useState<number | null>(null)
     const problemList = []
     const submissionList = computeSubmissionList(fetcher.data)
+
+    function onTeamNameChange(event : React.ChangeEvent<HTMLInputElement>){
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                return {...team, teamName: event.target.value}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
     useEffect(() => {
         const teamList = computeTeamList(fetcher.data)
-        console.log("Computed: ", teamList)
         setTeamList(teamList)
     }, [fetcher.data])
+
     return <div>
         <Header />
         <div className="m-8">
@@ -145,7 +157,13 @@ export default function UploadContest() {
                         teamList.map((team) => {
                             return <tr key={team.participantId}>
                                 <td className="border px-3 py-2 text-left"> {team.rank} </td>
-                                <td className="border px-3 py-2 text-left"> LU{team.participantId} </td>
+                                <td className="border px-3 py-2 text-left">
+                                    <input 
+                                        value={team.teamName}
+                                        onFocus={() => setEditingId(team.participantId)}
+                                        onChange={onTeamNameChange}
+                                    />
+                                </td>
                                 <td className="border px-3 py-2 text-left"> Test 1 </td>
                                 <td className="border px-3 py-2 text-left"> Test 2 </td>
                                 <td className="border px-3 py-2 text-left"> Test 3 </td>
@@ -157,29 +175,6 @@ export default function UploadContest() {
                     }
                 </tbody>
             </table>
-            <div className="flex flex-row">
-                <div className="m-2">
-                    Vieta
-                </div>
-                <div className="m-2">
-                    Komandas nosaukums
-                </div>
-                <div className="m-2">
-                    Dalībnieks 1
-                </div>
-                <div className="m-2">
-                    Dalībnieks 2
-                </div>
-                <div className="m-2">
-                    Dalībnieks 3
-                </div>
-                <div className="m-2">
-                    Officiāls
-                </div>
-                <div className="m-2">
-                    Izvēlēties no arhīva
-                </div>
-            </div>
         </div>
     </div>
 }
