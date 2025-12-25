@@ -97,20 +97,33 @@ async function main() {
       isLocal: true,
       teams: {
         connect: allTeams.map((team) => ({ id: team.id })),
-      },
-
-      tasks: {
-        create: [
-          { identifier: "A" },
-          { identifier: "B" },
-          { identifier: "C" },
-          { identifier: "D" },
-          { identifier: "E" },
-        ],
-      },
+      }
     },
   })
-
+  const A2025 = await prisma.contestTask.create({
+    data : {
+      identifier: "A",
+      contestId: contest2025.id
+    }
+  })
+  const B2025 = await prisma.contestTask.create({
+    data : {
+      identifier: "B",
+      contestId: contest2025.id
+    }
+  })
+  const C2025 = await prisma.contestTask.create({
+    data : {
+      identifier: "C",
+      contestId: contest2025.id
+    }
+  })
+  const D2025 = await prisma.contestTask.create({
+    data : {
+      identifier: "D",
+      contestId: contest2025.id
+    }
+  })
   // -------------------------
   // Submissions
   // -------------------------
@@ -139,7 +152,38 @@ async function main() {
       },
     ],
   })
-
+  await prisma.contestSubmission.createMany({
+    data: [
+      {
+        teamId: allTeams[0].id,
+        taskId: C2025.id,
+        contestId: contest2025.id,
+        submissionTime: 10,
+        isVerdictOk: false
+      },
+      {
+        teamId: allTeams[0].id,
+        taskId: C2025.id,
+        contestId: contest2025.id,
+        submissionTime: 11,
+        isVerdictOk: false
+      },
+      {
+        teamId: allTeams[0].id,
+        taskId: D2025.id,
+        contestId: contest2025.id,
+        submissionTime: 15,
+        isVerdictOk: true
+      },
+      {
+        teamId: allTeams[0].id,
+        taskId: C2025.id,
+        contestId: contest2025.id,
+        submissionTime: 50,
+        isVerdictOk: true
+      },
+    ]
+  })
   // -------------
   // Photos
   // -------------

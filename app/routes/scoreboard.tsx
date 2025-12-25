@@ -99,6 +99,21 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
     }
     const [elapsedTime, setElapsedTime] = useState(300)
 
+    const teamsInfo = contestTeams.map((team) => {
+        return {
+            id: team.id,
+            name: team.name,
+            solvedProblems: teamSolvedProblems(team.id),
+            penalty: teamTotalPenalty(team.id)
+        }
+    }).sort((a, b) => {
+        if(a.solvedProblems == b.solvedProblems){
+            return a.penalty - b.penalty
+        }
+        else{
+            return b.solvedProblems - a.solvedProblems
+        }
+    })
     return <div>
         <div className="m-8">
             <Link to="/" className="text-2xl font-bold text-blue-500">
@@ -137,7 +152,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                 </thead>
                 <tbody className="bg-gray-500">
                     {
-                        contestTeams.map((team) => {
+                        teamsInfo.map((team) => {
                             return <tr key={team.id}>
                                 <td className="border px-4 py-2 h-14 text-left font-semibold"> {team.name} </td>
                                 {
@@ -146,8 +161,8 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                                         return <CellData key={info.id} verdict={info.verdict} attempts={info.attempts}/>
                                     })
                                 }
-                                <td className="border px-4 py-2 text-left font-semibold"> {teamSolvedProblems(team.id)} </td>
-                                <td className="border px-4 py-2 text-left font-semibold"> {teamTotalPenalty(team.id)} </td>
+                                <td className="border px-4 py-2 text-left font-semibold"> {team.solvedProblems} </td>
+                                <td className="border px-4 py-2 text-left font-semibold"> {team.penalty} </td>
                             </tr>
                         })
                     }
