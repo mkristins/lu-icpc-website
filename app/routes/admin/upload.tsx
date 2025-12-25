@@ -3,6 +3,8 @@ import { Form, redirect, useFetcher } from "react-router";
 import Header from "~/shared/header";
 import { fetchCodeforcesData } from "~/cf.server";
 import { useEffect, useState } from "react";
+import type { CFAPIResponse } from "~/types/cf-api";
+import type { UploadTeamData } from "~/types/contest-upload";
 
 export function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -34,10 +36,7 @@ export async function action({request} : {request : Request}){
         }
         // Load the data from codeforces
         const data = await fetchCodeforcesData(apiKey.trim(), apiSecret.trim(), contestId.trim())
-        return {
-            success: true,
-            data: data
-        }
+        return data
     }
 }
 
@@ -46,22 +45,23 @@ function InputComponent({name, placeholder} : {name : string, placeholder : stri
 }
 
 export default function UploadContest() {
-    function computeTeamList(fetchData){
+    function computeTeamList(fetchData : CFAPIResponse) : UploadTeamData[]{
         if(!fetchData) return []
-        return fetchData.data.results.result.rows.map((res) => {
+        return fetchData.results.result.rows.map((res) => {
             return {
                 rank : res.rank,
-                teamId : res.party.participantId,
+                teamId: null,
+                participantId : res.party.participantId,
                 solvedProblems : res.points,
                 penalty : res.penalty 
             }
         })
     }
     // we work with local id's
-    function computeSubmissionList(fetchData){
-        if(!fetchData || !fetchData.data) return []
+    function computeSubmissionList(fetchData : CFAPIResponse){
+        if(!fetchData) return []
         console.log("special", fetchData)
-        return fetchData.data.submissions.result.map((sub) => {
+        return fetchData.submissions.result.map((sub) => {
             return {
                 teamId : sub.author.participantId,
                 problemIndex : sub.problem.index,
@@ -71,12 +71,14 @@ export default function UploadContest() {
     }
     const fetcher = useFetcher()
     console.log(fetcher.data)
-    const [teamList, setTeamList] = useState([])
+    const [teamList, setTeamList] = useState<UploadTeamData[]>([])
 
     const problemList = []
     const submissionList = computeSubmissionList(fetcher.data)
     useEffect(() => {
-        setTeamList(computeTeamList(fetcher.data))
+        const teamList = computeTeamList(fetcher.data)
+        console.log("Computed: ", teamList)
+        setTeamList(teamList)
     }, [fetcher.data])
     return <div>
         <Header />
@@ -115,6 +117,46 @@ export default function UploadContest() {
             <div>
                 Komandas
             </div>
+            <table className="min-w-full border">
+                <thead>
+                    <tr>
+                        <th className="border px-3 py-2 text-left"> Vieta </th>
+                        <th className="border px-3 py-2 text-left"> Komandas nosaukums </th>
+                        <th className="border px-3 py-2 text-left"> Dalībnieks 1 </th>
+                        <th className="border px-3 py-2 text-left"> Dalībnieks 2 </th>
+                        <th className="border px-3 py-2 text-left"> Dalībnieks 3 </th>
+                        <th className="border px-3 py-2 text-left"> Punkti </th>
+                        <th className="border px-3 py-2 text-left"> Soda minūtes </th>
+                        <th className="border px-3 py-2 text-left"> Officiāla? </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="border px-3 py-2 text-left"> 1 </td>
+                        <td className="border px-3 py-2 text-left"> Skrupulozās zemenītes </td>
+                        <td className="border px-3 py-2 text-left"> Valters Kalniņš </td>
+                        <td className="border px-3 py-2 text-left"> Valters Kalniņš </td>
+                        <td className="border px-3 py-2 text-left"> Valters Kalniņš </td>
+                        <td className="border px-3 py-2 text-left"> 10 </td>
+                        <td className="border px-3 py-2 text-left"> 1025 </td>
+                        <td className="border px-3 py-2 text-left"> Jā! </td>
+                    </tr>
+                    {
+                        teamList.map((team) => {
+                            return <tr key={team.participantId}>
+                                <td className="border px-3 py-2 text-left"> {team.rank} </td>
+                                <td className="border px-3 py-2 text-left"> LU{team.participantId} </td>
+                                <td className="border px-3 py-2 text-left"> Test 1 </td>
+                                <td className="border px-3 py-2 text-left"> Test 2 </td>
+                                <td className="border px-3 py-2 text-left"> Test 3 </td>
+                                <td className="border px-3 py-2 text-left"> {team.solvedProblems} </td>
+                                <td className="border px-3 py-2 text-left"> {team.penalty} </td>
+                                <td className="border px-3 py-2 text-left"> Nē! </td>
+                            </tr>
+                        })
+                    }
+                </tbody>
+            </table>
             <div className="flex flex-row">
                 <div className="m-2">
                     Vieta

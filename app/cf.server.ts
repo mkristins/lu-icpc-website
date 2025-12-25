@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import type { CFAPIResponse } from "./types/cf-api";
 
 function randomLetters(length = 6) {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
@@ -11,7 +12,7 @@ function randomLetters(length = 6) {
   return "abcdef";
 }
 
-export async function fetchCodeforcesData(apiKey : string, secret : string, contestId : string){
+export async function fetchCodeforcesData(apiKey : string, secret : string, contestId : string) : Promise<CFAPIResponse>{
     console.log("Attempt to fetch data from Codeforces.")
     const unixSeconds: number = Math.floor(Date.now() / 1000)
     const rand = randomLetters(6)

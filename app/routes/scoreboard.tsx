@@ -120,7 +120,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                 /> 
             </div>
             <table className="min-w-full border">
-                <thead className="bg-black">
+                <thead className="bg-gray-200">
                     <tr>
                         <th className="border px-4 py-2 text-left font-semibold"> Komanda </th>
                         {contestTasks.map((task) => (
