@@ -46,7 +46,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
     const penalties = [1111, 888]
     const contestYear = loaderData.year
     const contestTasks = loaderData.tasks
-    const contestTeams = loaderData.teams
+    const contestParticipations = loaderData.participations
     const contestSubmissions = loaderData.submissions
     function getNumber(limit : number){
         return Math.floor(Math.random() * limit)
@@ -99,12 +99,12 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
     }
     const [elapsedTime, setElapsedTime] = useState(300)
 
-    const teamsInfo = contestTeams.map((team) => {
+    const teamsInfo = contestParticipations.map((participation) => {
         return {
-            id: team.id,
-            name: team.name,
-            solvedProblems: teamSolvedProblems(team.id),
-            penalty: teamTotalPenalty(team.id)
+            id: participation.teamId,
+            name: participation.team.name,
+            solvedProblems: teamSolvedProblems(participation.teamId),
+            penalty: teamTotalPenalty(participation.teamId)
         }
     }).sort((a, b) => {
         if(a.solvedProblems == b.solvedProblems){

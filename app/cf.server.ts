@@ -13,7 +13,6 @@ function randomLetters(length = 6) {
 }
 
 export async function fetchCodeforcesData(apiKey : string, secret : string, contestId : string) : Promise<CFAPIResponse>{
-    console.log("Attempt to fetch data from Codeforces.")
     const unixSeconds: number = Math.floor(Date.now() / 1000)
     const rand = randomLetters(6)
     

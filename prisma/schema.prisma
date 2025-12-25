@@ -37,7 +37,6 @@ model Contest {
   pdfLink String?
   tasks ContestTask[]
   submissions  ContestSubmission[]
-  teams Team[]
   participations TeamParticipation[]
 }
  
@@ -52,10 +51,8 @@ model ContestTask {
 model Team {
   id          Int          @id @default(autoincrement())
   name        String
-  official Boolean @default(true)
   contestants Contestant[]
   submissions ContestSubmission[]
-  contests Contest[]
   participations TeamParticipation[]
 }
 
@@ -64,6 +61,7 @@ model TeamParticipation {
   solvedTasks Int
   penalty Int
   rank Int
+  official Boolean @default(true)
   medalIndex Int @default(0)
   team Team @relation(fields: [teamId], references: [id])
   contest Contest @relation(fields: [contestId], references: [id])

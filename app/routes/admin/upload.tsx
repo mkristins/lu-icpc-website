@@ -1,10 +1,11 @@
 import { isAuthorized } from "~/auth.server";
 import { Form, redirect, useFetcher } from "react-router";
 import Header from "~/shared/header";
-import { fetchCodeforcesData } from "~/cf.server";
 import { useEffect, useState } from "react";
 import type { CFAPIResponse } from "~/types/cf-api";
-import type { UploadTeamData } from "~/types/contest-upload";
+import type { UploadSubmissionData, UploadTeamData } from "~/types/contest-upload";
+import { fetchCodeforcesData } from "~/cf.server";
+import { uploadLocalContest } from "~/db.server";
 
 export function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -18,33 +19,38 @@ export function loader({request} : {request : Request}){
 }
 
 export async function action({request} : {request : Request}){
-    const formData = await request.formData();
-    const intent = formData.get("_action")
-    console.log(formData)
-    if(intent == "load"){
-        const apiKey = formData.get("codeforcesApiKey")
-        const apiSecret = formData.get("codeforcesApiSecret")
-        const contestId = formData.get("codeforcesContestId")
-        if (typeof apiKey !== "string") {
-            throw new Response("Invalid apiKey", { status: 400 })
-        }
-        if (typeof apiSecret !== "string") {
-            throw new Response("Invalid apiSecret", { status: 400 })
-        }
-        if (typeof contestId !== "string") {
-            throw new Response("Invalid contestId", { status: 400 })
-        }
-        // Load the data from codeforces
+    const json = await request.json()
+    if(json.intent == "load"){
+        const apiKey = json.apiKey
+        const apiSecret = json.apiSecret
+        const contestId = json.contestId
         const data = await fetchCodeforcesData(apiKey.trim(), apiSecret.trim(), contestId.trim())
         return data
     }
-    else if(intent == "save"){
-        console.log("save to system")
+    else if(json.intent == "save"){
+        await uploadLocalContest(
+            json.contestName,
+            json.teams,
+            json.submissions,
+            json.problems,
+            json.year,
+            new Date(),
+            new Date()
+        );
     }
 }
 
 function InputComponent({name, placeholder} : {name : string, placeholder : string}){
     return <input name={name} placeholder={placeholder} className="w-64 h-12 border rounded px-2 py-1 m-2" />
+}
+
+function NewInputComponent({value, placeholder, setValue} : {value : string, placeholder : string, setValue : (arg: string) => void}){
+    return <input 
+        value={value} 
+        placeholder={placeholder}
+        className="w-64 h-12 border rounded px-2 py-1 m-2" 
+        onChange={(e) => setValue(e.target.value)}
+    />
 }
 
 export default function UploadContest() {
@@ -53,15 +59,14 @@ export default function UploadContest() {
         return fetchData.results.result.rows.map((res) => {
             return {
                 rank : res.rank,
-                teamId: null,
                 member1: {
-                    name: "Member 1",
+                    name: "Dalībnieks 1",
                 },
                 member2: {
-                    name: "Member 2"
+                    name: "Dalībnieks 2"
                 },
                 member3: {
-                    name: "Member 3"
+                    name: "Dalībnieks 3"
                 },
                 teamName: `LU-${res.party.participantId}`,
                 participantId : res.party.participantId,
@@ -71,23 +76,28 @@ export default function UploadContest() {
         })
     }
     // we work with local id's
-    function computeSubmissionList(fetchData : CFAPIResponse){
+    function computeSubmissionList(fetchData : CFAPIResponse) : UploadSubmissionData[]{
         if(!fetchData) return []
         return fetchData.submissions.result.map((sub) => {
             return {
-                teamId : sub.author.participantId,
+                participantId : sub.author.participantId,
+                submissionTime: Math.floor(sub.relativeTimeSeconds / 60),
                 problemIndex : sub.problem.index,
-                verdict : sub.verdict == "OK"
+                isVerdictOk : sub.verdict == "OK"
             }
         })
     }
+
+    function computeProblemList(fetchData : CFAPIResponse) : string[]{
+        if(!fetchData) return []
+        return fetchData.results.result.problems.map(prob => prob.index)
+    }
+
     const fetcher = useFetcher()
-    console.log(fetcher.data)
     const [teamList, setTeamList] = useState<UploadTeamData[]>([])
     const [editingId, setEditingId] = useState<number | null>(null)
-    const problemList = []
+    const problemList = computeProblemList(fetcher.data)
     const submissionList = computeSubmissionList(fetcher.data)
-
     function onTeamNameChange(event : React.ChangeEvent<HTMLInputElement>){
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
@@ -115,10 +125,46 @@ export default function UploadContest() {
         }))
     }
 
+    function submitUpdates(){
+        fetcher.submit(
+            JSON.stringify({
+                intent: "save",
+                contestName: "Atlase: TODO",
+                teams: teamList,
+                problems: problemList,
+                submissions: submissionList,
+                year: 2026,
+
+            }),
+            {
+                method: "post",
+                encType: "application/json"
+            }
+        )
+    }
+
+    function requestCodeforcesData(){
+        fetcher.submit(
+            JSON.stringify({
+                intent: "load",
+                apiKey: apiKey,
+                apiSecret: apiSecret,
+                contestId: contestNumber
+            }),
+            {
+                method: "post",
+                encType: "application/json"
+            }
+        )
+    }
+
     useEffect(() => {
-        const teamList = computeTeamList(fetcher.data)
-        setTeamList(teamList)
+        setTeamList(computeTeamList(fetcher.data))
     }, [fetcher.data])
+
+    const [apiKey, setApiKey] = useState("")
+    const [apiSecret, setApiSecret] = useState("")
+    const [contestNumber, setContestNumber] = useState("")
 
     return <div>
         <Header />
@@ -142,7 +188,16 @@ export default function UploadContest() {
                 /> */}
                 <InputComponent name="year" placeholder="Gads" /> 
             </Form>
-            <fetcher.Form method="post" className="flex flex-col">
+            <div className="flex flex-col">
+                <div> Ielāde no "Codeforces" </div>
+                <NewInputComponent value={apiKey} placeholder="Codeforces API atslēga" setValue={setApiKey}/>
+                <NewInputComponent value={apiSecret} placeholder="Codeforces API noslēpums" setValue={setApiSecret}/>
+                <NewInputComponent value={contestNumber} placeholder="Codeforces sacensību ID" setValue={setContestNumber}/>
+                <button onClick={requestCodeforcesData} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
+                    Ielādēt no Codeforces!
+                </button>
+            </div>
+            {/* <fetcher.Form method="post" className="flex flex-col">
                 <div> Ielāde no "Codeforces" </div>
                 <InputComponent name="codeforcesApiKey" placeholder="Codeforces API atslēga" /> 
                 <InputComponent name="codeforcesApiSecret" placeholder="Codeforces API noslēpums" /> 
@@ -153,7 +208,7 @@ export default function UploadContest() {
                 <button type="submit" name="_action" value="load" className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
                     Ielādēt no Codeforces!
                 </button>
-            </fetcher.Form>
+            </fetcher.Form> */}
             <div>
                 Komandas
             </div>
@@ -211,8 +266,8 @@ export default function UploadContest() {
                     }
                 </tbody>
             </table>
-            <button type="submit" name="_action" value="save" className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
-                Saglabāt sistēmā!
+            <button onClick={submitUpdates}>
+                Submit Changes
             </button>
         </div>
     </div>

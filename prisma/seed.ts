@@ -74,9 +74,6 @@ async function main() {
       name: "LU Atlase 2024",
       isLocal: true,
       pdfLink: "lupo-data/competition-archive/2010/euc2025-official.pdf",
-      teams: {
-        connect: allTeams.map((team) => ({ id: team.id })),
-      },
 
       tasks: {
         create: [
@@ -95,9 +92,6 @@ async function main() {
       to: new Date("2025-06-01T14:00:00Z"),
       name: "LU Atlase 2025",
       isLocal: true,
-      teams: {
-        connect: allTeams.map((team) => ({ id: team.id })),
-      }
     },
   })
   const A2025 = await prisma.contestTask.create({
@@ -124,6 +118,33 @@ async function main() {
       contestId: contest2025.id
     }
   })
+
+  await prisma.teamParticipation.createMany({
+    data: [
+      {
+        solvedTasks: 10,
+        penalty: 5,
+        rank: 1,
+        teamId: 1,
+        contestId: contest2025.id
+      },
+      {
+        solvedTasks: 7,
+        penalty: 3,
+        rank: 2,
+        teamId: 2,
+        contestId: contest2025.id
+      },
+      {
+        solvedTasks: 6,
+        penalty: 121,
+        rank: 3,
+        teamId: 3,
+        contestId: contest2025.id
+      },
+    ]
+  })
+  
   // -------------------------
   // Submissions
   // -------------------------
