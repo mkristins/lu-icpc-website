@@ -11,5 +11,8 @@ export default [
     route("private/upload", "./routes/admin/upload.tsx"),
     route("gallery", "./routes/gallery/album-list.tsx"),
     route("gallery/upload", "./routes/gallery/album-upload.tsx"),
-    route("halloffame", "./routes/halloffame.tsx"),
+    route("halloffame", "./routes/halloffame/halloffame.tsx"),
+    route("halloffame/upload", "./routes/halloffame/fame-upload.tsx"),
+    route("halloffame/contestant/:id", "./routes/halloffame/contestant.tsx"),
+    route("halloffame/team/:id", "./routes/halloffame/team.tsx")
 ] satisfies RouteConfig;

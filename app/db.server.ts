@@ -58,13 +58,72 @@ export async function fetchAllContests(){
 }
 
 export async function fetchAllTeams(){
-    let teams = await prisma.team.findMany()
-    return teams
+    const teams = await prisma.team.findMany({
+        select: {
+            id: true,
+            name: true,
+            participations: { select: { official: true, medalIndex: true } },
+        },
+    });
+
+    return teams.map((t) => {
+        let officialParticipations = 0;
+        let gold = 0, silver = 0, bronze = 0;
+
+        for (const p of t.participations) {
+            if (p.official) officialParticipations += 1;
+            if (p.medalIndex === 1) gold += 1;
+            if (p.medalIndex === 2) silver += 1;
+            if (p.medalIndex === 3) bronze += 1;
+        }
+
+        return { id: t.id, name: t.name, officialParticipations, gold, silver, bronze };
+    });
 }
 
 export async function fetchAllContestants(){
-    let contestants = await prisma.contestant.findMany()
-    return contestants
+    const contestants = await prisma.contestant.findMany({
+        select: {
+            id: true,
+            name: true,
+            teams: {
+                select: {
+                    team : {
+                        select: {
+                            participations: {
+                                select: {
+                                    official: true,
+                                    medalIndex: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+    return contestants.map((c) => {
+
+        let officialParticipations = 0
+        let gold = 0, silver = 0, bronze = 0
+
+        for(const t of c.teams){
+            for(const p of t.team.participations){
+                if (p.official) officialParticipations += 1;
+                if (p.medalIndex === 1) gold += 1;
+                if (p.medalIndex === 2) silver += 1;
+                if (p.medalIndex === 3) bronze += 1;
+            }
+        }
+        return {
+            id: c.id,
+            name: c.name,
+            officialParticipations,
+            gold,
+            silver,
+            bronze
+        }
+    })
 }
 
 export async function fetchContest(id : string){
@@ -155,26 +214,41 @@ export async function uploadLocalContest(
                     }
                 })
                 if(t.member1.name){
-                    await prisma.contestant.create({
+                    const contestant1 = await prisma.contestant.create({
+                        data : {
+                            name: t.member1.name
+                        }
+                    })
+                    await prisma.teamMember.create({
                         data : {
                             teamId: dbTeam.id,
-                            name: t.member1.name
+                            contestantId: contestant1.id
                         }
                     })
                 }
                 if(t.member2.name){
-                    await prisma.contestant.create({
+                    const contestant2 = await prisma.contestant.create({
+                        data : {
+                            name: t.member2.name
+                        }
+                    })
+                    await prisma.teamMember.create({
                         data : {
                             teamId: dbTeam.id,
-                            name: t.member2.name
+                            contestantId: contestant2.id
                         }
                     })
                 }
                 if(t.member3.name){
-                    await prisma.contestant.create({
+                    const contestant3 = await prisma.contestant.create({
+                        data : {
+                            name: t.member3.name
+                        }
+                    })
+                    await prisma.teamMember.create({
                         data : {
                             teamId: dbTeam.id,
-                            name: t.member3.name
+                            contestantId: contestant3.id
                         }
                     })
                 }

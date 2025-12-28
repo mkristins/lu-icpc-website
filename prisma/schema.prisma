@@ -51,7 +51,7 @@ model ContestTask {
 model Team {
   id          Int          @id @default(autoincrement())
   name        String
-  contestants Contestant[]
+  members TeamMember[]
   submissions ContestSubmission[]
   participations TeamParticipation[]
 }
@@ -81,11 +81,18 @@ model ContestSubmission {
   taskId Int
 }
 
+model TeamMember {
+  id Int @id @default(autoincrement())
+  team Team @relation(fields: [teamId], references: [id])
+  contestant Contestant @relation(fields: [contestantId], references: [id])
+  teamId Int
+  contestantId Int
+}
+
 model Contestant {
   id     Int  @id @default(autoincrement())
   name  String?
-  team   Team @relation(fields: [teamId], references: [id])
-  teamId Int
+  teams TeamMember[]
 }
 
 model Album{

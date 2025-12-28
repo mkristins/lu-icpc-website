@@ -51,14 +51,42 @@ async function main() {
   const singleTeam = await prisma.team.create({
     data : {
       name: "Fake Coders",
-      contestants: {
-        create: [
-          {name: "Jānis Bērziņš"},
-          {name: "Alfrēds Bērziņš"},
-          {name: "Jānis Vītoliņš"}
-        ]
-      }
     }
+  })
+
+  const contestant1 = await prisma.contestant.create({
+    data : {
+      name: "Jānis Bērziņš"
+    }
+  })
+
+  const contestant2 = await prisma.contestant.create({
+    data : {
+      name: "Alfrēds Bērziņš"
+    }
+  })
+
+  const contestant3 = await prisma.contestant.create({
+    data : {
+      name : "Anna Bērziņa"
+    }
+  })
+
+  await prisma.teamMember.createMany({
+    data : [
+      {
+        teamId: singleTeam.id,
+        contestantId: contestant1.id
+      },
+      {
+        teamId: singleTeam.id,
+        contestantId: contestant2.id
+      },
+      {
+        teamId: singleTeam.id,
+        contestantId: contestant3.id
+      }
+    ]
   })
 
   const allTeams = await prisma.team.findMany()
@@ -126,21 +154,24 @@ async function main() {
         penalty: 5,
         rank: 1,
         teamId: 1,
-        contestId: contest2025.id
+        contestId: contest2025.id,
+        medalIndex: 1,
       },
       {
         solvedTasks: 7,
         penalty: 3,
         rank: 2,
         teamId: 2,
-        contestId: contest2025.id
+        contestId: contest2025.id,
+        medalIndex: 3,
       },
       {
         solvedTasks: 6,
         penalty: 121,
         rank: 3,
-        teamId: 3,
-        contestId: contest2025.id
+        teamId: singleTeam.id,
+        contestId: contest2025.id,
+        medalIndex: 2,
       },
     ]
   })

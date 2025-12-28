@@ -7,9 +7,9 @@ import { isAuthorized } from "~/auth.server";
 import { Link } from "react-router";
 
 export async function loader({request} : Route.LoaderArgs){
-  let teams = await fetchAllTeams()
-  let contestants = await fetchAllContestants()
-  let isAdmin = isAuthorized(request)
+  const teams = await fetchAllTeams()
+  const contestants = await fetchAllContestants()
+  const isAdmin = isAuthorized(request)
   return {
     teams: teams,
     contestants: contestants,
@@ -29,6 +29,10 @@ function ToggleButton({highlight, onClick, children} : {highlight : boolean, onC
     </button>
   }
 }
+
+// function TeamsStandings({te){
+
+// }
 
 export default function HallOfFame({loaderData} : Route.ComponentProps) {
   const [isTeamMode, setIsTeamMode] = useState(true)
@@ -53,13 +57,13 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
     <div className="m-8">
       {isTeamMode && loaderData.teams.map((team) => {
           return <div key={team.id}>
-            <div> {team.id}. {team.name} 0 golds, 0 silvers, 0 bronzes</div>
+            <div> {team.id}. {team.name} {team.officialParticipations} dalības, {team.gold} zelti, {team.silver} sudrabi, {team.bronze} bronzas</div>
           </div>
         })
       }
       {!isTeamMode && loaderData.contestants.map((contestant) => {
           return <div key={contestant.id}>
-            <div> {contestant.id}. {contestant.name} 0 golds, 0 silvers, 0 bronzes</div>
+            <div> {contestant.id}. {contestant.name} {contestant.officialParticipations} dalības, {contestant.gold} zelti, {contestant.silver} sudrabi, {contestant.bronze} bronzas</div>
           </div>
         })
       }
