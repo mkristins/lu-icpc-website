@@ -56,14 +56,18 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
     </div>
     <div className="m-8">
       {isTeamMode && loaderData.teams.map((team) => {
-          return <div key={team.id}>
-            <div> {team.id}. {team.name} {team.officialParticipations} dalības, {team.gold} zelti, {team.silver} sudrabi, {team.bronze} bronzas</div>
+          return <div key={team.id} className="flex flex-row h-16">
+            <div> {team.id}.</div>
+            <Link to={`./team/${team.id}`} className="font-bold text-blue-500"> {team.name} </Link>
+            <div> {team.participations} dalības, {team.gold} zelti, {team.silver} sudrabi, {team.bronze} bronzas</div>
           </div>
         })
       }
       {!isTeamMode && loaderData.contestants.map((contestant) => {
-          return <div key={contestant.id}>
-            <div> {contestant.id}. {contestant.name} {contestant.officialParticipations} dalības, {contestant.gold} zelti, {contestant.silver} sudrabi, {contestant.bronze} bronzas</div>
+          return <div key={contestant.id} className="flex flex-row h-16">
+            <div> {contestant.id} </div>
+            <Link to={`./contestant/${contestant.id}`} className="font-bold text-blue-500"> {contestant.name} </Link>
+            <div> {contestant.participations} dalības, {contestant.gold} zelti, {contestant.silver} sudrabi, {contestant.bronze} bronzas</div>
           </div>
         })
       }

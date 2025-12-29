@@ -30,6 +30,15 @@ function CellData({verdict, attempts} : {verdict: string, attempts: number}) {
                     </div>
                 </td>
     }
+    else if(verdict == "frozen"){
+        return <td className="border py-2 w-18 h-14 bg-blue-500"> 
+                    <div className="flex flex-col justify-center items-center">
+                        <div className="h-6">
+                        </div>
+                        <div className="text-xs"> {attempts} attempts </div>
+                    </div>
+                </td>
+    }
     else{
         return <td className="border px-4 py-2 w-18 h-14"> </td>
     }
@@ -58,7 +67,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                 id: task.id,
                 attempts: contestSubmissions.filter(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id)).length,
                 verdict: contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id && sub.isVerdictOk)) ? "ok" : (
-                    contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id)) ? "no" : "none"
+                    contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id)) ? "frozen" : "none"
                 )
             }
             // return {
@@ -97,7 +106,9 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
             return currentPenalty + firstSolveTime + extraPenalty
         }, 0)
     }
+
     const [elapsedTime, setElapsedTime] = useState(300)
+    const [frozen, setFrozen] = useState(false)
 
     const teamsInfo = contestParticipations.map((participation) => {
         return {
@@ -114,6 +125,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
             return b.solvedProblems - a.solvedProblems
         }
     })
+
     return <div>
         <div className="m-8">
             <Link to="/" className="text-2xl font-bold text-blue-500">
@@ -124,7 +136,12 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
             </div>
             <div>
                 <label htmlFor="frozen"> Iesaldēt? </label>
-                <input className="m-2" name="frozen" type="checkbox"/>
+                <input className="m-2" 
+                    name="frozen" 
+                    checked={frozen}
+                    onChange={(e) => setFrozen(e.target.checked)} 
+                    type="checkbox"
+                />
                 <input
                     type="range"
                     min="0"

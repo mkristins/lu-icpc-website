@@ -1,8 +1,6 @@
 import { PrismaClient } from "generated/prisma/client";
-import type { NewsArticle } from "generated/prisma/browser";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma } from "generated/prisma/client";
-import { parse } from "path";
 import type { UploadSubmissionData, UploadTeamData } from "./types/contest-upload";
 
 const adapter = new PrismaPg({
@@ -57,6 +55,32 @@ export async function fetchAllContests(){
     return contests
 }
 
+interface TeamRecords {
+    id: number;
+    name: string;
+    participations: {
+        official: boolean;
+        medalIndex: number;
+    }[];
+}
+
+function fetchTeamRecords(team : TeamRecords){
+    let participations = 0
+    let gold = 0, silver = 0, bronze = 0
+    for (const p of team.participations){
+        if (p.official) participations += 1;
+        if (p.medalIndex === 1) gold += 1;
+        if (p.medalIndex === 2) silver += 1;
+        if (p.medalIndex === 3) bronze += 1;
+    }
+    return {
+        participations: participations,
+        gold: gold,
+        silver: silver,
+        bronze: bronze
+    }
+}
+
 export async function fetchAllTeams(){
     const teams = await prisma.team.findMany({
         select: {
@@ -67,18 +91,41 @@ export async function fetchAllTeams(){
     });
 
     return teams.map((t) => {
-        let officialParticipations = 0;
-        let gold = 0, silver = 0, bronze = 0;
+        const record = fetchTeamRecords(t)
 
-        for (const p of t.participations) {
-            if (p.official) officialParticipations += 1;
-            if (p.medalIndex === 1) gold += 1;
-            if (p.medalIndex === 2) silver += 1;
-            if (p.medalIndex === 3) bronze += 1;
-        }
-
-        return { id: t.id, name: t.name, officialParticipations, gold, silver, bronze };
+        return { 
+            id: t.id, 
+            name: t.name, 
+            participations: record.participations, 
+            gold: record.gold, 
+            silver: record.silver, 
+            bronze: record.bronze 
+        };
     });
+}
+
+export async function fetchTeamProfile(id: number) {
+    const team = await prisma.team.findFirst({
+        where: {
+            id: id
+        },
+        include: {
+            members: true
+        }
+    })
+    return team
+}
+
+export async function fetchContestantProfile(id: number) {
+    const contestant = await prisma.contestant.findFirst({
+        where: {
+            id: id
+        },
+        include: {
+            teams: true
+        }
+    })
+    return contestant
 }
 
 export async function fetchAllContestants(){
@@ -90,6 +137,8 @@ export async function fetchAllContestants(){
                 select: {
                     team : {
                         select: {
+                            id: true,
+                            name: true,
                             participations: {
                                 select: {
                                     official: true,
@@ -104,21 +153,20 @@ export async function fetchAllContestants(){
     })
     return contestants.map((c) => {
 
-        let officialParticipations = 0
+        let participations = 0
         let gold = 0, silver = 0, bronze = 0
 
         for(const t of c.teams){
-            for(const p of t.team.participations){
-                if (p.official) officialParticipations += 1;
-                if (p.medalIndex === 1) gold += 1;
-                if (p.medalIndex === 2) silver += 1;
-                if (p.medalIndex === 3) bronze += 1;
-            }
+            const record = fetchTeamRecords(t.team)
+            participations += record.participations
+            gold += record.gold
+            silver += record.silver
+            bronze += record.bronze
         }
         return {
             id: c.id,
             name: c.name,
-            officialParticipations,
+            participations,
             gold,
             silver,
             bronze
