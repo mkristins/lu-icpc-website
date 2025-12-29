@@ -135,8 +135,8 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                 Statuss pēc {elapsedTime} minūtēm
             </div>
             <div>
-                <label htmlFor="frozen"> Iesaldēt? </label>
-                <input className="m-2" 
+                <label htmlFor="frozen" className="h-8 items-start"> Iesaldēt? </label>
+                <input className="m-2 h-8 w-8 items-center" 
                     name="frozen" 
                     checked={frozen}
                     onChange={(e) => setFrozen(e.target.checked)} 

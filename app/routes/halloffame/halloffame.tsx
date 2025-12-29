@@ -19,12 +19,12 @@ export async function loader({request} : Route.LoaderArgs){
 
 function ToggleButton({highlight, onClick, children} : {highlight : boolean, onClick : () => void, children : React.ReactNode}) {
   if(highlight){
-    return <button className="ml-2 mr-2 p-2 font-bold bg-green-500 border rounded">
+    return <button className="ml-2 mr-2 p-2 font-bold bg-green-500 border rounded-xl">
       {children}
     </button>
   }
   else{
-    return <button className="ml-2 mr-2 p-2 font-bold border rounded" onClick={onClick}>
+    return <button className="ml-2 mr-2 p-2 font-bold border rounded-xl" onClick={onClick}>
       {children}
     </button>
   }

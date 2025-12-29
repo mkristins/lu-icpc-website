@@ -6,6 +6,7 @@ import type { CFAPIResponse } from "~/types/cf-api";
 import type { UploadSubmissionData, UploadTeamData } from "~/types/contest-upload";
 import { fetchCodeforcesData } from "~/cf.server";
 import { uploadLocalContest } from "~/db.server";
+import PdfUploader from "~/components/pdf-upload";
 
 export function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -174,12 +175,7 @@ export default function UploadContest() {
             </div>
             <Form className="flex flex-col">
                 <InputComponent name="contestName" placeholder="Sacensību nosaukums" /> 
-                <div>
-                    Ieteicams nosaukt "LU Atlase [gads]"
-                </div>
-                <div>
-                    Uzdevumu PDF
-                </div>
+                <PdfUploader />
                 {/* <input
                     type="file"
                     name="taskPDF"
@@ -193,22 +189,10 @@ export default function UploadContest() {
                 <NewInputComponent value={apiKey} placeholder="Codeforces API atslēga" setValue={setApiKey}/>
                 <NewInputComponent value={apiSecret} placeholder="Codeforces API noslēpums" setValue={setApiSecret}/>
                 <NewInputComponent value={contestNumber} placeholder="Codeforces sacensību ID" setValue={setContestNumber}/>
-                <button onClick={requestCodeforcesData} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
+                <button onClick={requestCodeforcesData} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded-xl font-bold m-2">
                     Ielādēt no Codeforces!
                 </button>
             </div>
-            {/* <fetcher.Form method="post" className="flex flex-col">
-                <div> Ielāde no "Codeforces" </div>
-                <InputComponent name="codeforcesApiKey" placeholder="Codeforces API atslēga" /> 
-                <InputComponent name="codeforcesApiSecret" placeholder="Codeforces API noslēpums" /> 
-                <InputComponent name="codeforcesContestId" placeholder="Codeforces sacensību ID" /> 
-                <div>
-                    ⚠️ Uzmanību! Sistēma šīs atslēgas neuzglabā un izmanto tās tikai un vienīgi šo rezultātu izguvei no Codeforces sistēmas.
-                </div>
-                <button type="submit" name="_action" value="load" className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded font-bold m-2">
-                    Ielādēt no Codeforces!
-                </button>
-            </fetcher.Form> */}
             <div>
                 Komandas
             </div>
@@ -266,8 +250,8 @@ export default function UploadContest() {
                     }
                 </tbody>
             </table>
-            <button onClick={submitUpdates}>
-                Submit Changes
+            <button onClick={submitUpdates} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded-xl font-bold m-2">
+                Publicēt!
             </button>
         </div>
     </div>
