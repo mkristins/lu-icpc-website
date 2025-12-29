@@ -55,22 +55,70 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
       </ToggleButton>
     </div>
     <div className="m-8">
-      {isTeamMode && loaderData.teams.map((team) => {
-          return <div key={team.id} className="flex flex-row h-16">
-            <div> {team.id}.</div>
-            <Link to={`./team/${team.id}`} className="font-bold text-blue-500"> {team.name} </Link>
-            <div> {team.participations} dalības, {team.gold} zelti, {team.silver} sudrabi, {team.bronze} bronzas</div>
+      {isTeamMode &&
+          <div>
+            <table>
+              <thead className="border font-bold">
+                <th className="px-3 py-2 border">Komanda</th>
+                <th className="px-3 py-2 border">Dalības</th>
+                <th className="px-3 py-2 border">Zelts</th>
+                <th className="px-3 py-2 border">Sudrabs</th>
+                <th className="px-3 py-2 border">Bronza</th>
+                <th className="px-3 py-2 border">Medaļas kopā</th>
+              </thead>
+              <tbody>
+                {
+                  loaderData.teams.map((team) => {
+                    return <tr key={team.id}>
+                      <td className="px-3 py-2 border"><Link className="text-md text-blue-500" to={`./team/${team.id}`}>{team.name}</Link> </td>
+                      <td className="px-3 py-2 border">{team.participations}</td>
+                      <td className="px-3 py-2 border">{team.gold}</td>
+                      <td className="px-3 py-2 border">{team.silver}</td>
+                      <td className="px-3 py-2 border">{team.bronze}</td>
+                      <td className="px-3 py-2 border">{team.participations}</td>
+                    </tr>
+                  })
+                }
+              </tbody>
+            </table>
           </div>
-        })
       }
-      {!isTeamMode && loaderData.contestants.map((contestant) => {
+      {
+        !isTeamMode && <div>
+        <table>
+          <thead className="border font-bold">
+            <th className="px-3 py-2 border">Dalībnieks</th>
+            <th className="px-3 py-2 border">Dalības</th>
+            <th className="px-3 py-2 border">Zelts</th>
+            <th className="px-3 py-2 border">Sudrabs</th>
+            <th className="px-3 py-2 border">Bronza</th>
+            <th className="px-3 py-2 border">Medaļas kopā</th>
+          </thead>
+          <tbody>
+            {
+              loaderData.contestants.map((contestant) => {
+                return <tr key={contestant.id}>
+                  <td className="px-3 py-2 border"><Link className="text-md text-blue-500" to={`./contestant/${contestant.id}`}>{contestant.name}</Link> </td>
+                  <td className="px-3 py-2 border">{contestant.participations}</td>
+                  <td className="px-3 py-2 border">{contestant.gold}</td>
+                  <td className="px-3 py-2 border">{contestant.silver}</td>
+                  <td className="px-3 py-2 border">{contestant.bronze}</td>
+                  <td className="px-3 py-2 border">{contestant.participations}</td>
+                </tr>
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+      {/* {!isTeamMode && loaderData.contestants.map((contestant) => {
           return <div key={contestant.id} className="flex flex-row h-16">
             <div> {contestant.id} </div>
             <Link to={`./contestant/${contestant.id}`} className="font-bold text-blue-500"> {contestant.name} </Link>
             <div> {contestant.participations} dalības, {contestant.gold} zelti, {contestant.silver} sudrabi, {contestant.bronze} bronzas</div>
           </div>
         })
-      }
+      } */}
     </div>
   </div>
 }
