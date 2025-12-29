@@ -2,6 +2,7 @@ import { PrismaClient } from "generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma } from "generated/prisma/client";
 import type { UploadSubmissionData, UploadTeamData } from "./types/contest-upload";
+import { uploadPDF } from "./files.server";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -215,10 +216,13 @@ export async function uploadLocalContest(
     teams : UploadTeamData[],
     submissions : UploadSubmissionData[],
     problems : string[],
+    pdfFile : File,
     year : number,
     dateFrom : Date,
     dateTo : Date
 ){
+    await uploadPDF(pdfFile);
+    
     const dbContest = await prisma.contest.create({
         data: {
             name: contestName,

@@ -20,29 +20,48 @@ export function loader({request} : {request : Request}){
 }
 
 export async function action({request} : {request : Request}){
-    const json = await request.json()
-    if(json.intent == "load"){
-        const apiKey = json.apiKey
-        const apiSecret = json.apiSecret
-        const contestId = json.contestId
-        const data = await fetchCodeforcesData(apiKey.trim(), apiSecret.trim(), contestId.trim())
-        return data
+    const contentType = request.headers.get("content-type") || "";
+    if(contentType.includes("multipart/form-data")){
+        const form = await request.formData();
+        const intent = form.get("intent");
+
+        if (intent === "save") {
+            const contestName = String(form.get("contestName") || "");
+            const year = Number(form.get("year") || 0);
+            const teams = JSON.parse(String(form.get("teams") || "[]"));
+            const problems = JSON.parse(String(form.get("problems") || "[]"));
+            const submissions = JSON.parse(String(form.get("submissions") || "[]"));
+
+            const pdf = form.get("pdf"); // File | null
+            if (!(pdf instanceof File) || pdf.size === 0) {
+                return {}
+            }
+            await uploadLocalContest(
+                contestName,
+                teams,
+                submissions,
+                problems,
+                pdf,
+                year,
+                new Date(),
+                new Date()
+            );
+        }
     }
-    else if(json.intent == "save"){
-        await uploadLocalContest(
-            json.contestName,
-            json.teams,
-            json.submissions,
-            json.problems,
-            json.year,
-            new Date(),
-            new Date()
-        );
+    else{
+        const json = await request.json()
+        if(json.intent == "load"){
+            const apiKey = json.apiKey
+            const apiSecret = json.apiSecret
+            const contestId = json.contestId
+            const data = await fetchCodeforcesData(apiKey.trim(), apiSecret.trim(), contestId.trim())
+            return data
+        }
     }
 }
 
-function InputComponent({name, placeholder} : {name : string, placeholder : string}){
-    return <input name={name} placeholder={placeholder} className="w-64 h-12 border rounded px-2 py-1 m-2" />
+function InputComponent({name, placeholder, value, setValue} : {name : string, placeholder : string, value : string, setValue: (arg: string) => void}){
+    return <input name={name} value={value} placeholder={placeholder} onChange={(e) => setValue(e.target.value)} className="w-64 h-12 border rounded px-2 py-1 m-2" />
 }
 
 function NewInputComponent({value, placeholder, setValue} : {value : string, placeholder : string, setValue : (arg: string) => void}){
@@ -127,19 +146,20 @@ export default function UploadContest() {
     }
 
     function submitUpdates(){
+        const formData = new FormData();
+        formData.append("intent", "save")
+        formData.append("contestName", title)
+        formData.append("teams", JSON.stringify(teamList))
+        formData.append("submissions", JSON.stringify(submissionList))
+        formData.append("problems", JSON.stringify(problemList))
+        formData.append("year", year)
+        if(pdfFile)
+            formData.append("pdf", pdfFile)
         fetcher.submit(
-            JSON.stringify({
-                intent: "save",
-                contestName: "Atlase: TODO",
-                teams: teamList,
-                problems: problemList,
-                submissions: submissionList,
-                year: 2026,
-
-            }),
+            formData,
             {
                 method: "post",
-                encType: "application/json"
+                encType: "multipart/form-data"
             }
         )
     }
@@ -163,10 +183,12 @@ export default function UploadContest() {
         setTeamList(computeTeamList(fetcher.data))
     }, [fetcher.data])
 
+    const [pdfFile, setPdfFile] = useState<File | null>(null)
+    const [title, setTitle] = useState("")
+    const [year, setYear] = useState("")
     const [apiKey, setApiKey] = useState("")
     const [apiSecret, setApiSecret] = useState("")
     const [contestNumber, setContestNumber] = useState("")
-
     return <div>
         <Header />
         <div className="m-8">
@@ -174,15 +196,15 @@ export default function UploadContest() {
                 Sacensību ielāde
             </div>
             <Form className="flex flex-col">
-                <InputComponent name="contestName" placeholder="Sacensību nosaukums" /> 
-                <PdfUploader />
+                <InputComponent name="contestName" placeholder="Sacensību nosaukums" value={title} setValue={setTitle} /> 
+                <PdfUploader onChange={setPdfFile}/>
                 {/* <input
                     type="file"
                     name="taskPDF"
                     required
                     className="border w-48 h-10 m-2 flex flex-col items-center justify-center"
                 /> */}
-                <InputComponent name="year" placeholder="Gads" /> 
+                <InputComponent name="year" placeholder="Gads" value={year} setValue={setYear} /> 
             </Form>
             <div className="flex flex-col">
                 <div> Ielāde no "Codeforces" </div>
