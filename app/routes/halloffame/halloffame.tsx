@@ -42,7 +42,7 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
       Panākumi
     </div>
     <AdminWrap isAdmin={loaderData.isAdmin}>
-      <Link to="/" className="m-8 font-bold text-2xl text-blue-500">
+      <Link to="./upload" className="m-8 font-bold text-2xl text-blue-500">
         Pievienot starptautisku panākumu
       </Link>
     </AdminWrap>

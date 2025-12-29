@@ -86,6 +86,7 @@ export default function NewsEditor({articleId, articleJson, isEditable} : {artic
   const fetcher = useFetcher()
   const [isSaved, setIsSaved] = useState(true)
   const [contentJson, setContentJson] = useState(articleJson)
+  const [title, setTitle] = useState("Parauga virsraksts")
   const editor = useEditor({
     extensions,
     content: JSON.parse(articleJson),
@@ -106,24 +107,37 @@ export default function NewsEditor({articleId, articleJson, isEditable} : {artic
     </div>
   }
   else{
-  return (
-    <div>
-      {
-        isEditable &&
-        <fetcher.Form method="post" className='m-8'>
-          <button className="m-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8" onClick={onClick} type="submit"> Save </button>
-          <input type="hidden" name="contentJson" value={contentJson} />
-          <input type="hidden" name="articleId" value={articleId} />
-        </fetcher.Form>
-      }
-      <div className='ml-8'>
+    return (
+      <div className='mx-8'>
         {
           isEditable &&
-          <MenuBar editor={editor} />
+          <fetcher.Form method="post">
+            <button className="rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8" onClick={onClick} type="submit"> Saglabāt </button>
+            <input type="hidden" name="contentJson" value={contentJson} />
+            <input type="hidden" name="articleId" value={articleId} />
+          </fetcher.Form>
         }
-        <EditorContent className="m-2" editor={editor} />
+        {
+          isEditable &&
+          <>
+            <div className='font-bold text-2xl'>
+              Virsraksts
+            </div>
+            <input className="h-8 w-full border" placeholder='Virsraksts' value={title} onChange={(e) => setTitle(e.target.value)} />
+          </>
+        }
+        {
+          !isEditable &&
+          <div className="font-bold text-2xl"> {title} </div>
+        }
+        <div>
+          {
+            isEditable &&
+            <MenuBar editor={editor} />
+          }
+          <EditorContent className="m-2" editor={editor} />
+        </div>
       </div>
-    </div>
     )
   }
 }

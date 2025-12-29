@@ -148,7 +148,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                     max="300"
                     value={elapsedTime}
                     onChange={(e) => setElapsedTime(parseInt(e.target.value))}
-                    className="w-full accent-blue-600"
+                    className="w-full accent-blue-600 mb-4"
                 /> 
             </div>
             <table className="min-w-full border">

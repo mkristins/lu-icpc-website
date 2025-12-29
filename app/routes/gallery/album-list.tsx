@@ -25,7 +25,7 @@ export default function AlbumList({loaderData} : Route.ComponentProps) {
         Pievienot fotoalbumu!
       </Link>
     </AdminWrap>
-    <div className="m-8 flex flex-col">
+    <div className="mx-8 flex flex-col">
       {
         loaderData.albums.map(album => {
           return <div key={album.id}>{album.title} </div>

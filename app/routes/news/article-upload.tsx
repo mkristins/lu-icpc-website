@@ -1,8 +1,8 @@
 import Header from "~/shared/header";
 
-export default function FameUpload(){
+export default function ArticleUpload(){
     return <div>
         <Header />
-        Panākumu ielāde
+        Jauns ziņu raksts
     </div>
 }

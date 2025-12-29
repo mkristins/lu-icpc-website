@@ -26,6 +26,10 @@ export async function loader({request, params} : Route.LoaderArgs){
 export async function action({
   request,
 }: Route.ActionArgs) {
+  const isAdmin = isAuthorized(request)
+  if(!isAdmin){
+    throw new Response("Unauthorized", {status: 401})
+  }
   const formData = await request.formData()
   const articleId = formData.get("articleId")
   const articleJson = formData.get("contentJson")

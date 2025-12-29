@@ -4,6 +4,7 @@ import { fetchAllNewsArticles } from "~/db.server";
 import type { Route } from "./+types/news";
 import { isAuthorized } from "~/auth.server";
 import AdminWrap from "~/components/admin-wrap";
+import { Link } from "react-router";
 
 export async function loader({request, params} : Route.LoaderArgs) {
     let all_articles = await fetchAllNewsArticles();
@@ -27,9 +28,9 @@ export default function News({loaderData} : Route.ComponentProps) {
         <Header />
         <div className="mx-8 font-bold text-2xl"> Ziņas </div>
         <AdminWrap isAdmin={loaderData.isAdmin}>
-            <div className="text-blue-500 font-bold text-2xl mx-8">
+            <Link to="./upload" className="text-blue-500 font-bold text-2xl mx-8">
                 Jauna ziņa!
-            </div>
+            </Link>
         </AdminWrap>
         {
             loaderData.articles.map((article) => {
