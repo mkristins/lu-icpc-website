@@ -18,20 +18,20 @@ export async function loader({request, params} : Route.LoaderArgs){
 
 export default function ArticleView({loaderData} : Route.ComponentProps){
   if(!loaderData.article) {
-    return <div>
-        <Header />
-        <h1> SAITE NEEKSISTĒ! </h1>
-    </div>
-}
-else{
-  return <div>
-        <Header />
-        <AdminWrap isAdmin={loaderData.isAdmin}>
-          <Link to="./edit" className="font-bold text-blue-500 text-2xl m-8">
-            Rediģēt!
-          </Link>
-        </AdminWrap>
-        <NewsEditor articleId={loaderData.article.id} articleJson={loaderData.article.text} isEditable={false}/>
+      return <div>
+          <Header />
+          <h1> SAITE NEEKSISTĒ! </h1>
       </div>
-}
+  }
+  else{
+    return <div>
+          <Header />
+          <AdminWrap isAdmin={loaderData.isAdmin}>
+            <Link to="./edit" className="font-bold text-blue-500 text-2xl m-8">
+              Rediģēt!
+            </Link>
+          </AdminWrap>
+          <NewsEditor articleId={loaderData.article.id} articleJson={loaderData.article.text} isEditable={false}/>
+        </div>
+  }
 }

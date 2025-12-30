@@ -111,7 +111,16 @@ export async function fetchTeamProfile(id: number) {
             id: id
         },
         include: {
-            members: true
+            members: {
+                include: {
+                    contestant: true
+                }
+            },
+            participations : {
+                include : {
+                    contest: true
+                }
+            }
         }
     })
     return team
@@ -123,7 +132,19 @@ export async function fetchContestantProfile(id: number) {
             id: id
         },
         include: {
-            teams: true
+            teams: {
+                include: {
+                    team: {
+                        include: {
+                            participations : {
+                                include : {
+                                    contest: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     })
     return contestant
