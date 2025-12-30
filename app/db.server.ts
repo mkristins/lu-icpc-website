@@ -221,12 +221,13 @@ export async function uploadLocalContest(
     dateFrom : Date,
     dateTo : Date
 ){
-    await uploadPDF(pdfFile);
+    const pdfUrl = await uploadPDF(pdfFile);
     
     const dbContest = await prisma.contest.create({
         data: {
             name: contestName,
             isLocal : true,
+            pdfLink: pdfUrl,
             year : year,
             from: dateFrom,
             to : dateTo

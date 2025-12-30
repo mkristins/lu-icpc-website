@@ -101,7 +101,7 @@ async function main() {
       to: new Date("2024-06-01T14:00:00Z"),
       name: "LU Atlase 2024",
       isLocal: true,
-      pdfLink: "lupo-data/competition-archive/2010/euc2025-official.pdf",
+      pdfLink: "competition-archive/2010/euc2025-official.pdf",
 
       tasks: {
         create: [

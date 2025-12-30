@@ -201,7 +201,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
     console.log(teamList)
 
     function onType(name : string){
-        console.log("Peak DB Name", name)
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
                 return {...team, teamId: undefined, teamName: name}

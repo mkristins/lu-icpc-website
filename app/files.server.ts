@@ -29,15 +29,17 @@ export async function uploadPDF(file : File) {
         }
     })
 
+    const id = crypto.randomUUID();
     const arrayBuffer = await file.arrayBuffer();
     const body = Buffer.from(arrayBuffer);
-
+    const pdfUrl = `/example/pdf/${id}/${file.name}`
     await client.send(
         new PutObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME!,
-            Key: "example/test-uploads/image.pdf",
+            Key: pdfUrl,
             Body: body,
             ContentType: "application/pdf"
         })
     )
+    return pdfUrl
 }
