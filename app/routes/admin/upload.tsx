@@ -5,13 +5,17 @@ import { useEffect, useState } from "react";
 import type { CFAPIResponse } from "~/types/cf-api";
 import type { UploadSubmissionData, UploadTeamData } from "~/types/contest-upload";
 import { fetchCodeforcesData } from "~/cf.server";
-import { uploadLocalContest } from "~/db.server";
+import { fetchAllTeams, uploadLocalContest } from "~/db.server";
 import PdfUploader from "~/components/pdf-upload";
+import TeamSearchCell from "~/components/team-search";
+import type { Route } from "./+types/upload";
 
-export function loader({request} : {request : Request}){
+export async function loader({request} : {request : Request}){
     if(isAuthorized(request)){
+        const teams = await fetchAllTeams()
         return {
-            isAdmin: true
+            isAdmin: true,
+            teams: teams
         }
     }
     else{
@@ -73,7 +77,7 @@ function NewInputComponent({value, placeholder, setValue} : {value : string, pla
     />
 }
 
-export default function UploadContest() {
+export default function UploadContest({loaderData} : Route.ComponentProps) {
     function computeTeamList(fetchData : CFAPIResponse) : UploadTeamData[]{
         if(!fetchData) return []
         return fetchData.results.result.rows.map((res) => {
@@ -183,6 +187,31 @@ export default function UploadContest() {
         setTeamList(computeTeamList(fetcher.data))
     }, [fetcher.data])
 
+    function selectTeam(t : {id:number, name: string}){
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                return {...team, teamId: t.id, teamName: t.name}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
+    console.log(teamList)
+
+    function onType(name : string){
+        console.log("Peak DB Name", name)
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                return {...team, teamId: undefined, teamName: name}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
     const [pdfFile, setPdfFile] = useState<File | null>(null)
     const [title, setTitle] = useState("")
     const [year, setYear] = useState("")
@@ -237,10 +266,12 @@ export default function UploadContest() {
                             return <tr key={team.participantId}>
                                 <td className="border px-3 py-2 text-left"> {team.rank} </td>
                                 <td className="border px-3 py-2 text-left">
-                                    <input 
+                                    <TeamSearchCell
+                                        allTeams={loaderData.teams}
                                         value={team.teamName}
                                         onFocus={() => setEditingId(team.participantId)}
-                                        onChange={onTeamNameChange}
+                                        onPick={selectTeam}
+                                        onType={onType}
                                     />
                                 </td>
                                 <td className="border px-3 py-2 text-left"> 
@@ -265,14 +296,18 @@ export default function UploadContest() {
                                     />
                                 </td>
                                 <td className="border px-3 py-2 text-left"> {team.solvedProblems} </td>
-                                <td className="border px-3 py-2 text-left"> {team.penalty} </td>
+                                {team.teamId ?
+                                     <td className="border px-3 py-2 text-left bg-gray-200"> {team.penalty} </td> :
+                                     <td className="border px-3 py-2 text-left"> {team.penalty} </td>
+                                }
+                                
                                 <td className="border px-3 py-2 text-left"> Nē! </td>
                             </tr>
                         })
                     }
                 </tbody>
             </table>
-            <button onClick={submitUpdates} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded-xl font-bold m-2">
+            <button onClick={submitUpdates} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded-xl font-bold m-2 mb-24">
                 Publicēt!
             </button>
         </div>
