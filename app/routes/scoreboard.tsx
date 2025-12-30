@@ -171,7 +171,11 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                     {
                         teamsInfo.map((team) => {
                             return <tr key={team.id}>
-                                <td className="border px-4 py-2 h-14 text-left font-semibold"> {team.name} </td>
+                                <td className="border px-4 py-2 h-14 text-left font-semibold">
+                                    <Link className="text-blue-900" to={`/halloffame/team/${team.id}`}>
+                                        {team.name}
+                                    </Link>
+                                </td>
                                 {
                                     teamSubmissionList(team.id).map((info) => {
     
