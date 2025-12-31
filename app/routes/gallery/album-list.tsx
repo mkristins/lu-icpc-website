@@ -28,7 +28,7 @@ export default function AlbumList({loaderData} : Route.ComponentProps) {
     <div className="mx-8 flex flex-col">
       {
         loaderData.albums.map(album => {
-          return <div key={album.id}>{album.title} </div>
+          return <Link className="my-2 font-bold text-xl" key={album.id} to={`./${album.id}`}>{album.title} </Link>
         })
       }
     </div>

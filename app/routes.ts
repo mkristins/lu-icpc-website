@@ -15,7 +15,8 @@ export default [
    
     route("gallery", "./routes/gallery/album-list.tsx"),
     route("gallery/upload", "./routes/gallery/album-upload.tsx"),
-   
+    route("gallery/:id", "./routes/gallery/album-view.tsx"),
+    
     route("halloffame", "./routes/halloffame/halloffame.tsx"),
     route("halloffame/upload", "./routes/halloffame/fame-upload.tsx"),
     route("halloffame/contestant/:id", "./routes/halloffame/contestant.tsx"),

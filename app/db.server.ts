@@ -2,7 +2,7 @@ import { PrismaClient } from "generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma } from "generated/prisma/client";
 import type { UploadSubmissionData, UploadTeamData } from "./types/contest-upload";
-import { uploadPDF } from "./files.server";
+import { uploadAlbumImage, uploadPDF } from "./files.server";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -356,3 +356,32 @@ export async function uploadLocalContest(
         }
     })
 }   
+
+export async function uploadAlbum(title : string, files : File[]){
+    const album = await prisma.album.create({
+        data : {
+            title: title
+        }
+    })
+    for(const f of files){
+        const imgUrl = await uploadAlbumImage(f)
+        await prisma.albumPhoto.create({
+            data : {
+                albumId: album.id,
+                photoLink: imgUrl
+            }
+        })
+    }
+}
+
+export async function fetchAlbum(id : number){
+    const album = await prisma.album.findFirst({
+        where: {
+            id: id
+        },
+        include: {
+            photos: true
+        }
+    })
+    return album
+}
