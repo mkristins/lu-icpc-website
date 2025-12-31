@@ -6,22 +6,22 @@ import { Link } from "react-router"
 
 export async function loader({params} : Route.LoaderArgs){
     const contestId = params.id
-    let contest = await fetchContest(contestId)
+    const contest = await fetchContest(contestId)
     return contest
 }
 
-function CellData({verdict, attempts} : {verdict: string, attempts: number}) {
+function CellData({verdict, attempts, freezeAttempts, firstSolveTime} : {verdict: string, attempts: number, freezeAttempts : number, firstSolveTime : number | undefined}) {
     if(verdict == "ok"){
         return <td className="border py-2 w-18 h-14 bg-green-500"> 
                     <div className="flex flex-col justify-center items-center">
                         <div className="h-6">
-                            OK
+                            {firstSolveTime}
                         </div>
                         <div className="text-xs"> {attempts} attempts</div>
                     </div>
                 </td>
     }
-    else if(verdict == "no"){
+    else if(attempts > 0 && freezeAttempts == 0){
         return <td className="border py-2 w-18 h-14 bg-red-500"> 
                     <div className="flex flex-col justify-center items-center">
                         <div className="h-6">
@@ -30,17 +30,17 @@ function CellData({verdict, attempts} : {verdict: string, attempts: number}) {
                     </div>
                 </td>
     }
-    else if(verdict == "frozen"){
+    else if(attempts > 0){
         return <td className="border py-2 w-18 h-14 bg-blue-500"> 
                     <div className="flex flex-col justify-center items-center">
                         <div className="h-6">
                         </div>
-                        <div className="text-xs"> {attempts} attempts </div>
+                        <div className="text-[0.625rem]"> {attempts - freezeAttempts} + {freezeAttempts} attempts </div>
                     </div>
                 </td>
     }
     else{
-        return <td className="border px-4 py-2 w-18 h-14"> </td>
+        return <td className="border py-2 w-18 h-14"> </td>
     }
 }
 
@@ -51,46 +51,59 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
             <div> LAPA NEEKSISTĒ </div>
         </div>
     }
-    const points = [9, 7]
-    const penalties = [1111, 888]
-    const contestYear = loaderData.year
     const contestTasks = loaderData.tasks
     const contestParticipations = loaderData.participations
     const contestSubmissions = loaderData.submissions
     function getNumber(limit : number){
         return Math.floor(Math.random() * limit)
     }
+
+    function computeFirstSolveTime(teamId : number, taskId : number){
+        return contestSubmissions.reduce((currentSolveTime, submission) => {
+            if((!frozen || submission.submissionTime < 240) && submission.submissionTime <= elapsedTime && submission.teamId == teamId && submission.taskId == taskId && submission.isVerdictOk){
+                if(currentSolveTime == -1 || submission.submissionTime <= currentSolveTime){
+                    return submission.submissionTime
+                }
+            }
+            return currentSolveTime
+        }, -1)
+    }
+
+    function computeTaskStatus(teamId : number, taskId : number){
+        const firstSolveTime = computeFirstSolveTime(teamId, taskId)
+        if(firstSolveTime != -1){
+            return {
+                totalAttempts: contestSubmissions.filter(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == taskId)).length,
+                firstSolveTime: firstSolveTime,
+                postFreezeAttempts: 0,
+                verdict: "ok"
+            }
+        }
+        else{
+            return {
+                totalAttempts: contestSubmissions.filter(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == taskId)).length,
+                postFreezeAttempts: frozen ? contestSubmissions.filter(sub => (240 <= sub.submissionTime && sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == taskId)).length : 0,
+                verdict: "none"
+            }
+        }
+    }
+
     function teamSubmissionList(teamId : number){
 
         return contestTasks.map((task) => {
             return {
                 id: task.id,
-                attempts: contestSubmissions.filter(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id)).length,
-                verdict: contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id && sub.isVerdictOk)) ? "ok" : (
-                    contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id)) ? "frozen" : "none"
-                )
+                ...computeTaskStatus(teamId, task.id),
             }
-            // return {
-            //     id: task.id,
-            //     attempts: getNumber(7) + 1,
-            //     verdict: getNumber(2) == 0 ? "ok" : "no"
-            // }
         })
     }
 
     function teamSolvedProblems(teamId : number){
-        return contestTasks.filter((task) => contestSubmissions.some(sub => (sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id && sub.isVerdictOk))).length
+        return contestTasks.filter((task) => contestSubmissions.some(sub => ((!frozen || sub.submissionTime < 240) && sub.submissionTime <= elapsedTime && sub.teamId == teamId && sub.taskId == task.id && sub.isVerdictOk))).length
     }
     function teamTotalPenalty(teamId : number){
         return contestTasks.reduce((currentPenalty, task) => {
-            const firstSolveTime = contestSubmissions.reduce((currentSolveTime, submission) => {
-                if(submission.submissionTime <= elapsedTime && submission.teamId == teamId && submission.taskId == task.id && submission.isVerdictOk){
-                    if(currentSolveTime == -1 || submission.submissionTime <= currentSolveTime){
-                        return submission.submissionTime
-                    }
-                }
-                return currentSolveTime
-            }, -1)
+            const firstSolveTime = computeFirstSolveTime(teamId, task.id)
             if(firstSolveTime == -1){
                 return currentPenalty
             }
@@ -179,7 +192,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                                 {
                                     teamSubmissionList(team.id).map((info) => {
     
-                                        return <CellData key={info.id} verdict={info.verdict} attempts={info.attempts}/>
+                                        return <CellData key={info.id} verdict={info.verdict} attempts={info.totalAttempts} freezeAttempts={info.postFreezeAttempts} firstSolveTime={info.firstSolveTime}/>
                                     })
                                 }
                                 <td className="border px-4 py-2 text-left font-semibold"> {team.solvedProblems} </td>

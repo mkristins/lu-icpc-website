@@ -207,6 +207,20 @@ async function main() {
   await prisma.contestSubmission.createMany({
     data: [
       {
+        teamId: allTeams[1].id,
+        taskId: A2025.id,
+        contestId: contest2025.id,
+        submissionTime: 255,
+        isVerdictOk: true
+      },
+      {
+        teamId: allTeams[1].id,
+        taskId: A2025.id,
+        contestId: contest2025.id,
+        submissionTime: 144,
+        isVerdictOk: false
+      },
+      {
         teamId: allTeams[0].id,
         taskId: C2025.id,
         contestId: contest2025.id,
