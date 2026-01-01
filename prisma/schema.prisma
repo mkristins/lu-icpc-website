@@ -91,7 +91,7 @@ model TeamMember {
 
 model Contestant {
   id     Int  @id @default(autoincrement())
-  name  String?
+  name  String
   teams TeamMember[]
 }
 

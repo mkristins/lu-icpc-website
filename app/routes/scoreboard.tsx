@@ -17,7 +17,7 @@ function CellData({verdict, attempts, freezeAttempts, firstSolveTime} : {verdict
                         <div className="h-6">
                             {firstSolveTime}
                         </div>
-                        <div className="text-xs"> {attempts} attempts</div>
+                        <div className="text-xs"> {attempts} reizes</div>
                     </div>
                 </td>
     }
@@ -26,7 +26,7 @@ function CellData({verdict, attempts, freezeAttempts, firstSolveTime} : {verdict
                     <div className="flex flex-col justify-center items-center">
                         <div className="h-6">
                         </div>
-                        <div className="text-xs"> {attempts} attempts </div>
+                        <div className="text-xs"> {attempts} reizes </div>
                     </div>
                 </td>
     }
@@ -35,7 +35,7 @@ function CellData({verdict, attempts, freezeAttempts, firstSolveTime} : {verdict
                     <div className="flex flex-col justify-center items-center">
                         <div className="h-6">
                         </div>
-                        <div className="text-[0.625rem]"> {attempts - freezeAttempts} + {freezeAttempts} attempts </div>
+                        <div className="text-[0.625rem]"> {attempts - freezeAttempts} + {freezeAttempts} reizes </div>
                     </div>
                 </td>
     }

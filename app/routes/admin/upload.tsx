@@ -3,19 +3,22 @@ import { Form, redirect, useFetcher } from "react-router";
 import Header from "~/shared/header";
 import { useEffect, useState } from "react";
 import type { CFAPIResponse } from "~/types/cf-api";
-import type { UploadSubmissionData, UploadTeamData } from "~/types/contest-upload";
+import type { ContestantSelect, TeamSelect, UploadSubmissionData, UploadTeamData } from "~/types/contest-upload";
 import { fetchCodeforcesData } from "~/cf.server";
-import { fetchAllTeams, uploadLocalContest } from "~/db.server";
+import { fetchContestants, fetchTeamsWithMembers, uploadLocalContest } from "~/db.server";
 import PdfUploader from "~/components/pdf-upload";
 import TeamSearchCell from "~/components/team-search";
 import type { Route } from "./+types/upload";
+import ContestantSearchCell from "~/components/contestant-search";
 
 export async function loader({request} : {request : Request}){
     if(isAuthorized(request)){
-        const teams = await fetchAllTeams()
+        const teams = await fetchTeamsWithMembers()
+        const contestants = await fetchContestants()
         return {
             isAdmin: true,
-            teams: teams
+            teams: teams,
+            contestants: contestants
         }
     }
     else{
@@ -50,6 +53,7 @@ export async function action({request} : {request : Request}){
                 new Date(),
                 new Date()
             );
+            return redirect("/archive")
         }
     }
     else{
@@ -77,6 +81,32 @@ function NewInputComponent({value, placeholder, setValue} : {value : string, pla
     />
 }
 
+function RowHighlighting({highlight, children} : {highlight : boolean, children : React.ReactNode }){
+    if(highlight){
+        return <tr className="bg-blue-300">
+            {children}
+        </tr>
+    }
+    else{
+        return <tr>
+            {children}
+        </tr>
+    }
+}
+
+function CellHighlighting({highlight, children} : {highlight : boolean, children : React.ReactNode}) {
+    if(highlight){
+        return <td className="border px-3 py-2 text-left bg-amber-300">
+            {children}
+        </td>
+    }
+    else{
+        return <td className="border px-3 py-2 text-left">
+            {children}
+        </td>
+    }
+}
+
 export default function UploadContest({loaderData} : Route.ComponentProps) {
     function computeTeamList(fetchData : CFAPIResponse) : UploadTeamData[]{
         if(!fetchData) return []
@@ -84,13 +114,13 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
             return {
                 rank : res.rank,
                 member1: {
-                    name: "Dalībnieks 1",
+                    name: "",
                 },
                 member2: {
-                    name: "Dalībnieks 2"
+                    name: ""
                 },
                 member3: {
-                    name: "Dalībnieks 3"
+                    name: ""
                 },
                 teamName: `LU-${res.party.participantId}`,
                 participantId : res.party.participantId,
@@ -137,11 +167,11 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
                 if(memberId == 1)
-                    return {...team, member1: {name: event.target.value}}
+                    return {...team, teamId: undefined, member1: {name: event.target.value}}
                 else if(memberId == 2)
-                    return {...team, member2: {name: event.target.value}}
+                    return {...team, teamId: undefined, member2: {name: event.target.value}}
                 else
-                    return {...team, member3: {name: event.target.value}}
+                    return {...team, teamId: undefined, member3: {name: event.target.value}}
             }
             else{
                 return team
@@ -187,10 +217,60 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
         setTeamList(computeTeamList(fetcher.data))
     }, [fetcher.data])
 
-    function selectTeam(t : {id:number, name: string}){
+    function selectTeam(t : TeamSelect){
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
-                return {...team, teamId: t.id, teamName: t.name}
+                const newMember1 = t.members.length > 0 ? {
+                    contestantId : t.members[0].contestant.id,
+                    name : t.members[0].contestant.name ? t.members[0].contestant.name : ""
+                } : {name: ""}
+
+                const newMember2 = t.members.length > 1 ? {
+                    contestantId : t.members[1].contestant.id,
+                    name : t.members[1].contestant.name ? t.members[1].contestant.name : ""
+                } : {name: ""}
+
+                const newMember3 = t.members.length > 2 ? {
+                    contestantId : t.members[2].contestant.id,
+                    name : t.members[2].contestant.name ? t.members[2].contestant.name : ""
+                } : {name: ""}
+                // return {...team, teamId: t.id, teamName: t.name, member1: {
+                //     contestantId: t.members[0].contestant.id,
+                //     name: t.members[1].contestant.name ? t.members[1].contestant.name : ""
+                // }}
+                return {...team, teamId: t.id, teamName: t.name, member1: newMember1, member2: newMember2, member3: newMember3}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
+    function selectContestant(t : ContestantSelect, index : number){
+        console.log("select this bitch", t)
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                if(index == 1){
+                    return {...team, teamId: undefined, member1: {
+                        contestantId: t.id,
+                        name: t.name
+                    }}
+                }
+                else if(index == 2){
+                    return {...team, teamId: undefined, member2: {
+                        contestantId: t.id,
+                        name: t.name
+                    }}
+                }
+                else if(index == 3){
+                    return {...team, teamId: undefined, member3: {
+                        contestantId: t.id,
+                        name: t.name
+                    }}
+                }
+                else{
+                    return team
+                }
             }
             else{
                 return team
@@ -204,6 +284,34 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
                 return {...team, teamId: undefined, teamName: name}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
+    function onTypeContestant(name : string, index : number){
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                if(index == 1){
+                    return {...team, teamId: undefined, member1: {
+                        name: name
+                    }}
+                }
+                else if(index == 2){
+                    return {...team, teamId: undefined, member2: {
+                        name: name
+                    }}
+                }
+                else if(index == 3){
+                    return {...team, teamId: undefined, member3: {
+                        name: name
+                    }}
+                }
+                else{
+                    return team
+                }
             }
             else{
                 return team
@@ -262,7 +370,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                 <tbody>
                     {
                         teamList.map((team) => {
-                            return <tr key={team.participantId}>
+                            return <RowHighlighting highlight={!!team.teamId} key={team.participantId}>
                                 <td className="border px-3 py-2 text-left"> {team.rank} </td>
                                 <td className="border px-3 py-2 text-left">
                                     <TeamSearchCell
@@ -273,27 +381,47 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                                         onType={onType}
                                     />
                                 </td>
-                                <td className="border px-3 py-2 text-left"> 
-                                    <input 
+                                {/* <td className="border px-3 py-2 text-left">
+                                    A
+                                </td>
+                                <td className="border px-3 py-2 text-left">
+                                    B
+                                </td>
+                                <td className="border px-3 py-2 text-left">
+                                    C
+                                </td> */}
+                                <CellHighlighting highlight={!!team.member1.contestantId && !team.teamId}>
+                                    <ContestantSearchCell 
+                                        allContestants={loaderData.contestants}
+                                        value={team.member1.name}
+                                        onFocus={() => setEditingId(team.participantId)}
+                                        onPick={(t : ContestantSelect) => selectContestant(t, 1)}
+                                        onType={(t : string) => onTypeContestant(t, 1)}
+                                    />
+                                    {/* <input 
                                         value={team.member1.name}
                                         onFocus={() => setEditingId(team.participantId)}
                                         onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(1, e)}
-                                    />
-                                </td>
-                                <td className="border px-3 py-2 text-left">
-                                    <input 
+                                    /> */}
+                                </CellHighlighting>
+                                <CellHighlighting highlight={!!team.member2.contestantId && !team.teamId}>
+                                    <ContestantSearchCell 
+                                        allContestants={loaderData.contestants}
                                         value={team.member2.name}
                                         onFocus={() => setEditingId(team.participantId)}
-                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(2, e)}
+                                        onPick={(t : ContestantSelect) => selectContestant(t, 2)}
+                                        onType={(t : string) => onTypeContestant(t, 2)}
                                     />
-                                </td>
-                                <td className="border px-3 py-2 text-left">
-                                    <input 
+                                </CellHighlighting>
+                                <CellHighlighting highlight={!!team.member3.contestantId && !team.teamId}>
+                                    <ContestantSearchCell 
+                                        allContestants={loaderData.contestants}
                                         value={team.member3.name}
                                         onFocus={() => setEditingId(team.participantId)}
-                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(3, e)}
+                                        onPick={(t : ContestantSelect) => selectContestant(t, 3)}
+                                        onType={(t : string) => onTypeContestant(t, 3)}
                                     />
-                                </td>
+                                </CellHighlighting>
                                 <td className="border px-3 py-2 text-left"> {team.solvedProblems} </td>
                                 {team.teamId ?
                                      <td className="border px-3 py-2 text-left bg-gray-200"> {team.penalty} </td> :
@@ -301,7 +429,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                                 }
                                 
                                 <td className="border px-3 py-2 text-left"> Nē! </td>
-                            </tr>
+                            </RowHighlighting>
                         })
                     }
                 </tbody>

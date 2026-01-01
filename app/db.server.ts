@@ -105,6 +105,24 @@ export async function fetchAllTeams(){
     });
 }
 
+export async function fetchTeamsWithMembers(){
+    return await prisma.team.findMany({
+        select: {
+            id: true,
+            name: true,
+            members: {
+                select: {
+                    contestant: true
+                }
+            }
+        }
+    })
+}
+
+export async function fetchContestants(){
+    return await prisma.contestant.findMany({})
+}
+
 export async function fetchTeamProfile(id: number) {
     const team = await prisma.team.findFirst({
         where: {
@@ -117,6 +135,11 @@ export async function fetchTeamProfile(id: number) {
                 }
             },
             participations : {
+                orderBy: {
+                    contest: {
+                        year: 'desc',
+                    },
+                },
                 include : {
                     contest: true
                 }
@@ -137,6 +160,11 @@ export async function fetchContestantProfile(id: number) {
                     team: {
                         include: {
                             participations : {
+                                orderBy: {
+                                    contest: {
+                                        year: 'desc',
+                                    },
+                                },
                                 include : {
                                     contest: true
                                 }

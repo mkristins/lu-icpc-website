@@ -21,3 +21,19 @@ export interface UploadSubmissionData{
   problemIndex: string;
   isVerdictOk: boolean;
 }
+
+export interface TeamSelect{
+    id: number;
+    name: string;
+    members: {
+        contestant: {
+            id: number;
+            name: string | null;
+        };
+    }[]
+}
+
+export interface ContestantSelect{
+  id: number;
+  name: string;
+}

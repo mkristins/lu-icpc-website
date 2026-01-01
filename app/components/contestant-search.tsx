@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import type { TeamSelect } from "~/types/contest-upload";
+import type { ContestantSelect, TeamSelect } from "~/types/contest-upload";
 
-export default function TeamSearchCell({
+export default function ContestantSearchCell({
     value,
-    allTeams,
+    allContestants,
     onFocus,
     onPick,
     onType,
 }: {
     value: string;
-    allTeams: TeamSelect[];
+    allContestants: ContestantSelect[];
     onFocus: () => void;
-    onPick: (t: TeamSelect) => void;
+    onPick: (t: ContestantSelect) => void;
     onType: (v: string) => void;
 }) {
     const [open, setOpen] = useState(false);
@@ -23,16 +23,12 @@ export default function TeamSearchCell({
 
     const results = useMemo(() => {
         const qq = q.trim().toLowerCase();
-        if (!qq) return allTeams.slice(0, 10);
+        if (!qq) return allContestants.slice(0, 10);
 
-        return allTeams
+        return allContestants
         .filter(t => t.name.toLowerCase().includes(qq))
         .slice(0, 10);
-    }, [q, allTeams]);
-
-    function pickTeam(t : TeamSelect){
-        onPick(t)
-    }
+    }, [q, allContestants]);
 
     return (
         <div className="relative">
@@ -59,10 +55,10 @@ export default function TeamSearchCell({
                 }}
                 onChange={(e) => {
                     const v = e.target.value;
-                    onType(v);   // update row teamName (your existing behavior)
-                    setQ(v);     // drive filter input
+                    onType(v);
+                    setQ(v);
                 }}
-                placeholder="Komandas nosaukums..."
+                placeholder="Dalībnieka vārds..."
             />
         </div>
 
@@ -78,7 +74,8 @@ export default function TeamSearchCell({
                                 type="button"
                                 className="w-full text-left px-3 py-2 hover:bg-gray-200"
                                 onClick={() => {
-                                    pickTeam(t)
+                                    console.log("Piss Off")
+                                    onPick(t)
                                 }}
                             >
                                 {t.name}
