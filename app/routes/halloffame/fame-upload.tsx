@@ -7,6 +7,7 @@ import { fetchContestants, fetchTeamsWithMembers } from "~/db.server";
 import TeamSearchCell from "~/components/team-search";
 import type { TeamSelect } from "~/types/contest-upload";
 import ContestantSearchCell from "~/components/contestant-search";
+import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
 
 export async function loader({request} : Route.LoaderArgs){
     if(!isAuthorized(request)){
@@ -242,7 +243,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                 <tbody>
                     {
                         teamInfo.map((team) => {
-                            return <tr key={team.contextId}>
+                            return <RowHighlighting highlight={!!team.teamId} key={team.contextId}>
                                 <td className="px-3 py-2 border">
                                     <TeamSearchCell 
                                         allTeams={loaderData.teams}
@@ -252,7 +253,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                         onType={onTeamType}
                                     />
                                 </td>
-                                <td className="px-3 py-2 border">
+                                <CellHighlighting highlight={!team.teamId && !!team.member1.id}>
                                     <ContestantSearchCell 
                                         allContestants={loaderData.contestants}
                                         value={team.member1.name}
@@ -260,8 +261,8 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                         onPick={(t : MemberInfo) => onTeamMemberChange(t, 1)}
                                         onType={(t : string) => onTeamMemberType(t, 1)}
                                     />
-                                </td>
-                                <td className="px-3 py-2 border">
+                                </CellHighlighting>
+                                <CellHighlighting highlight={!team.teamId && !!team.member2.id}>
                                     <ContestantSearchCell 
                                         allContestants={loaderData.contestants}
                                         value={team.member2.name}
@@ -269,8 +270,8 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                         onPick={(t : MemberInfo) => onTeamMemberChange(t, 2)}
                                         onType={(t : string) => onTeamMemberType(t, 2)}
                                     />
-                                </td>
-                                <td className="px-3 py-2 border">
+                                </CellHighlighting>
+                                <CellHighlighting highlight={!team.teamId && !!team.member3.id}>
                                     <ContestantSearchCell 
                                         allContestants={loaderData.contestants}
                                         value={team.member3.name}
@@ -278,7 +279,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                         onPick={(t : MemberInfo) => onTeamMemberChange(t, 3)}
                                         onType={(t : string) => onTeamMemberType(t, 3)}
                                     />
-                                </td>
+                                </CellHighlighting>
                                 <td className="px-3 py-2 border">
                                     <input 
                                         className="w-24"
@@ -305,7 +306,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                     />
                                 </td>
                                 <td className="px-3 py-2 border">{team.medalIndex}</td>
-                            </tr>
+                            </RowHighlighting>
                         })
                     }
                 </tbody>

@@ -10,6 +10,7 @@ import PdfUploader from "~/components/pdf-upload";
 import TeamSearchCell from "~/components/team-search";
 import type { Route } from "./+types/upload";
 import ContestantSearchCell from "~/components/contestant-search";
+import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
 
 export async function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -79,32 +80,6 @@ function NewInputComponent({value, placeholder, setValue} : {value : string, pla
         className="w-64 h-12 border rounded px-2 py-1 m-2" 
         onChange={(e) => setValue(e.target.value)}
     />
-}
-
-function RowHighlighting({highlight, children} : {highlight : boolean, children : React.ReactNode }){
-    if(highlight){
-        return <tr className="bg-blue-300">
-            {children}
-        </tr>
-    }
-    else{
-        return <tr>
-            {children}
-        </tr>
-    }
-}
-
-function CellHighlighting({highlight, children} : {highlight : boolean, children : React.ReactNode}) {
-    if(highlight){
-        return <td className="border px-3 py-2 text-left bg-amber-300">
-            {children}
-        </td>
-    }
-    else{
-        return <td className="border px-3 py-2 text-left">
-            {children}
-        </td>
-    }
 }
 
 export default function UploadContest({loaderData} : Route.ComponentProps) {
