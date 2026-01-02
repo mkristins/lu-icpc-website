@@ -16,7 +16,6 @@ export default function TeamSearchCell({
 }) {
     const [open, setOpen] = useState(false);
     const [q, setQ] = useState(value);
-
     useEffect(() => {
         setQ(value)
     }, [value]);

@@ -74,7 +74,6 @@ export default function ContestantSearchCell({
                                 type="button"
                                 className="w-full text-left px-3 py-2 hover:bg-gray-200"
                                 onClick={() => {
-                                    console.log("Piss Off")
                                     onPick(t)
                                 }}
                             >

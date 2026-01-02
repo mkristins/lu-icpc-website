@@ -247,7 +247,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
     }
 
     function selectContestant(t : ContestantSelect, index : number){
-        console.log("select this bitch", t)
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
                 if(index == 1){
@@ -278,7 +277,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
         }))
     }
 
-    console.log(teamList)
 
     function onType(name : string){
         setTeamList(teamList.map((team) => {

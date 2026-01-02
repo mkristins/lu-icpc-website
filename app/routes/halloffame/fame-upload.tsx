@@ -3,21 +3,49 @@ import type { Route } from "./+types/fame-upload";
 import { isAuthorized } from "~/auth.server";
 import { Link, redirect } from "react-router";
 import { useState } from "react";
+import { fetchContestants, fetchTeamsWithMembers } from "~/db.server";
+import TeamSearchCell from "~/components/team-search";
+import type { TeamSelect } from "~/types/contest-upload";
+import ContestantSearchCell from "~/components/contestant-search";
 
-export function loader({request} : Route.LoaderArgs){
+export async function loader({request} : Route.LoaderArgs){
     if(!isAuthorized(request)){
         return redirect("/")
     }
+    const teams = await fetchTeamsWithMembers()
+    const contestants = await fetchContestants()
+    return {
+        teams: teams,
+        contestants: contestants
+    }
 }
 
-export default function FameUpload(){
-    const [teamInfo, setTeamInfo] = useState([
+interface MemberInfo{
+    id?: number,
+    name: string
+}
+
+interface TeamInfo{
+    contextId: number,
+    teamId?: number,
+    name: string,
+    member1: MemberInfo,
+    member2: MemberInfo,
+    member3: MemberInfo
+    rank: number,
+    points: number,
+    penalty: number,
+    medalIndex: number
+}
+
+export default function FameUpload({loaderData} : Route.ComponentProps){
+    const [teamInfo, setTeamInfo] = useState<TeamInfo[]>([
         {
             contextId: 1,
             name : "Skrupulozās zemenītes",
-            member1: "MK",
-            member2: "KŠ",
-            member3: "VK",
+            member1: {name: "MK"},
+            member2: {name: "KŠ"},
+            member3: {name: "VK"},
             rank: 7,
             points: 8,
             penalty: 518,
@@ -29,9 +57,9 @@ export default function FameUpload(){
         setTeamInfo([...teamInfo, {
             contextId: teamInfo.length + 1,
             name : "Neskrupulozās zemenītes",
-            member1: "MK",
-            member2: "KŠ",
-            member3: "VK",
+            member1: {name: "MK"},
+            member2: {name: "KŠ"},
+            member3: {name: "VK"},
             rank: 1,
             points: 1,
             penalty: 555,
@@ -45,6 +73,102 @@ export default function FameUpload(){
         setTeamInfo(teamInfo.map((team) => {
             if(team.contextId == editingId){
                 return {...team, name: event.target.value}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
+
+    function onTeamChange(t : TeamSelect){
+        setTeamInfo(teamInfo.map((team) => {
+            if(team.contextId == editingId){
+                const newMember1 = t.members.length > 0 ? {
+                    id : t.members[0].contestant.id,
+                    name : t.members[0].contestant.name ? t.members[0].contestant.name : ""
+                } : {name: ""}
+
+                const newMember2 = t.members.length > 1 ? {
+                    id : t.members[1].contestant.id,
+                    name : t.members[1].contestant.name ? t.members[1].contestant.name : ""
+                } : {name: ""}
+
+                const newMember3 = t.members.length > 2 ? {
+                    id : t.members[2].contestant.id,
+                    name : t.members[2].contestant.name ? t.members[2].contestant.name : ""
+                } : {name: ""}
+                return {...team, teamId: team.contextId, name: t.name, member1: newMember1, member2: newMember2, member3: newMember3}
+            }
+            else{
+                return {...team}
+            }
+        }))
+    }
+
+    function onTeamType(t : string){
+       setTeamInfo(teamInfo.map((team) => {
+            if(team.contextId == editingId){
+                return {...team, teamId: undefined, name: t}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
+    function onTeamMemberChange(t : MemberInfo, index : number){
+        setTeamInfo(teamInfo.map((team) => {
+            if(team.contextId == editingId){
+               if(index == 1){
+                    return {...team, teamId: undefined, member1: {
+                        id: t.id,
+                        name: t.name
+                    }}
+                }
+                else if(index == 2){
+                    return {...team, teamId: undefined, member2: {
+                        id: t.id,
+                        name: t.name
+                    }}
+                }
+                else if(index == 3){
+                    return {...team, teamId: undefined, member3: {
+                        id: t.id,
+                        name: t.name
+                    }}
+                }
+                else{
+                    return team
+                }
+            }
+            else{
+                return {...team}
+            }
+        }))
+    }
+
+    function onTeamMemberType(t : string, index : number) {
+        setTeamInfo(teamInfo.map((team) => {
+            if(team.contextId == editingId){
+                if(index == 1){
+                    return {...team, teamId: undefined, member1: {
+                        name: t
+                    }}
+                }
+                else if(index == 2){
+                    return {...team, teamId: undefined, member2: {
+                        name: t
+                    }}
+                }
+                else if(index == 3){
+                    return {...team, teamId: undefined, member3: {
+                        name: t
+                    }}
+                }
+                else{
+                    return team
+                }
             }
             else{
                 return team
@@ -104,29 +228,57 @@ export default function FameUpload(){
             />
             <table className="mx-8">
                 <thead className="border font-bold">
-                    <th className="px-3 py-2 border">Komanda</th>
-                    <th className="px-3 py-2 border">Dalībnieks 1</th>
-                    <th className="px-3 py-2 border">Dalībnieks 2</th>
-                    <th className="px-3 py-2 border">Dalībnieks 3</th>
-                    <th className="px-3 py-2 border">Vieta</th>
-                    <th className="px-3 py-2 border">Uzdevumu skaits</th>
-                    <th className="px-3 py-2 border">Soda minūtes</th>
-                    <th className="px-3 py-2 border">Medaļa</th>
+                    <tr>
+                        <th className="px-3 py-2 border">Komanda</th>
+                        <th className="px-3 py-2 border">Dalībnieks 1</th>
+                        <th className="px-3 py-2 border">Dalībnieks 2</th>
+                        <th className="px-3 py-2 border">Dalībnieks 3</th>
+                        <th className="px-3 py-2 border">Vieta</th>
+                        <th className="px-3 py-2 border">Uzdevumu skaits</th>
+                        <th className="px-3 py-2 border">Soda minūtes</th>
+                        <th className="px-3 py-2 border">Medaļa</th>
+                    </tr>
                 </thead>
                 <tbody>
                     {
                         teamInfo.map((team) => {
-                            return <tr>
+                            return <tr key={team.contextId}>
                                 <td className="px-3 py-2 border">
-                                    <input 
+                                    <TeamSearchCell 
+                                        allTeams={loaderData.teams}
                                         value={team.name}
                                         onFocus={() => setEditingId(team.contextId)}
-                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamNameChange(e)}
+                                        onPick={onTeamChange}
+                                        onType={onTeamType}
                                     />
                                 </td>
-                                <td className="px-3 py-2 border">{team.member1}</td>
-                                <td className="px-3 py-2 border">{team.member2}</td>
-                                <td className="px-3 py-2 border">{team.member3}</td>
+                                <td className="px-3 py-2 border">
+                                    <ContestantSearchCell 
+                                        allContestants={loaderData.contestants}
+                                        value={team.member1.name}
+                                        onFocus={() => setEditingId(team.contextId)}
+                                        onPick={(t : MemberInfo) => onTeamMemberChange(t, 1)}
+                                        onType={(t : string) => onTeamMemberType(t, 1)}
+                                    />
+                                </td>
+                                <td className="px-3 py-2 border">
+                                    <ContestantSearchCell 
+                                        allContestants={loaderData.contestants}
+                                        value={team.member2.name}
+                                        onFocus={() => setEditingId(team.contextId)}
+                                        onPick={(t : MemberInfo) => onTeamMemberChange(t, 2)}
+                                        onType={(t : string) => onTeamMemberType(t, 2)}
+                                    />
+                                </td>
+                                <td className="px-3 py-2 border">
+                                    <ContestantSearchCell 
+                                        allContestants={loaderData.contestants}
+                                        value={team.member3.name}
+                                        onFocus={() => setEditingId(team.contextId)}
+                                        onPick={(t : MemberInfo) => onTeamMemberChange(t, 3)}
+                                        onType={(t : string) => onTeamMemberType(t, 3)}
+                                    />
+                                </td>
                                 <td className="px-3 py-2 border">
                                     <input 
                                         className="w-24"
