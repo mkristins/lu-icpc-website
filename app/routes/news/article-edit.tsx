@@ -10,6 +10,7 @@ import { useFetcher } from "react-router";
 import { updateNewsArticle } from "~/db.server";
 import NewsEditor from "~/components/news-editor";
 import { isAuthorized } from "~/auth.server";
+import type { UploadArticle } from "~/types/content";
 
 export async function loader({request, params} : Route.LoaderArgs){ 
   const isAdmin = isAuthorized(request)
@@ -30,23 +31,19 @@ export async function action({
   if(!isAdmin){
     throw new Response("Unauthorized", {status: 401})
   }
-  const formData = await request.formData()
-  const articleId = formData.get("articleId")
-  const articleJson = formData.get("contentJson")
-  if (typeof articleId !== "string") {
-    throw new Response("Invalid articleId", { status: 400 })
-  }
 
-  if (typeof articleJson !== "string") {
-    throw new Response("Invalid contentJson", { status: 400 })
-  }
-  
-  await updateNewsArticle(articleId, articleJson)
+  const json = await request.json()
+  const articleId = json.articleId
+  const article = json.article
+  const articleTitle = article.title
+  const articleJson = article.jsonBody
+  await updateNewsArticle(articleId, articleTitle, articleJson)
 }
 
 
 export default function ArticleEdit({loaderData} : Route.ComponentProps){
     const fetcher = useFetcher()
+
     if(!loaderData.article) {
         return <div>
             <Header />
@@ -54,12 +51,21 @@ export default function ArticleEdit({loaderData} : Route.ComponentProps){
         </div>
     }
     else{
+      function onSave(t : UploadArticle){
+        fetcher.submit(JSON.stringify({
+          articleId: loaderData.article?.id,
+          article : t
+        }), {
+          method: "post",
+          encType: "application/json"
+        })
+      }
       return <div>
             <Header />
             <Link to={`/news/${loaderData.article.id}`} className="font-bold text-blue-500 text-2xl m-8">
               Apskatīt!
             </Link>
-            <NewsEditor articleId={loaderData.article.id} articleJson={loaderData.article.text} isEditable={true}/>
+            <NewsEditor articleJson={loaderData.article.text} articleTitle={loaderData.article.title} isEditable={true} onSave={onSave} saveTitle="Saglabāt"/>
           </div>
     }
 }

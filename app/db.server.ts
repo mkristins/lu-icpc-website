@@ -36,13 +36,23 @@ export async function fetchNewsArticle(id: string) {
     return article
 }
 
-export async function updateNewsArticle(id: string, newText : string){
+export async function updateNewsArticle(id: string, newTitle : string,  newText : string){
     await prisma.newsArticle.update({
         where: {
             id : parseInt(id)
         },
         data : {
+            title: newTitle,
             text: newText
+        }
+    })
+}
+
+export async function createNewsArticle(title : string, text : string){
+    await prisma.newsArticle.create({
+        data : {
+            title: title,
+            text: text
         }
     })
 }

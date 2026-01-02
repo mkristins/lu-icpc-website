@@ -6,6 +6,7 @@ import { isAuthorized } from "~/auth.server"
 import AdminAuth from "../admin/admin"
 import AdminWrap from "~/components/admin-wrap"
 import { Link } from "react-router"
+import type { UploadArticle } from "~/types/content"
 
 export async function loader({request, params} : Route.LoaderArgs){ 
   let article = await fetchNewsArticle(params.id)
@@ -31,7 +32,7 @@ export default function ArticleView({loaderData} : Route.ComponentProps){
               Rediģēt!
             </Link>
           </AdminWrap>
-          <NewsEditor articleId={loaderData.article.id} articleJson={loaderData.article.text} isEditable={false}/>
+          <NewsEditor articleJson={loaderData.article.text} articleTitle={loaderData.article.title} isEditable={false} onSave={(t : UploadArticle) => {}} saveTitle=""/>
         </div>
   }
 }

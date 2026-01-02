@@ -6,6 +6,7 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import React, { useState } from 'react'
 import { useFetcher } from 'react-router'
+import type { UploadArticle } from '~/types/content'
 
 const extensions = [TextStyleKit, StarterKit]
 
@@ -82,11 +83,11 @@ function MenuBar({ editor }: { editor: Editor }) {
   )
 }
 
-export default function NewsEditor({articleId, articleJson, isEditable} : {articleId : number, articleJson : string, isEditable : boolean}){
+export default function NewsEditor({articleJson, articleTitle, isEditable, saveTitle, onSave} : {articleJson : string, articleTitle : string, isEditable : boolean, saveTitle : string, onSave : (arg: UploadArticle) => void}){
   const fetcher = useFetcher()
   const [isSaved, setIsSaved] = useState(true)
   const [contentJson, setContentJson] = useState(articleJson)
-  const [title, setTitle] = useState("Parauga virsraksts")
+  const [title, setTitle] = useState(articleTitle)
   const editor = useEditor({
     extensions,
     content: JSON.parse(articleJson),
@@ -99,7 +100,11 @@ export default function NewsEditor({articleId, articleJson, isEditable} : {artic
     editable: isEditable
   })
   function onClick(event : React.MouseEvent) {
-    setIsSaved(false)
+    setIsSaved(true)
+    onSave({
+      jsonBody: contentJson,
+      title: title
+    })
   }
   if(!editor){
     <div className='m-8'>
@@ -109,14 +114,6 @@ export default function NewsEditor({articleId, articleJson, isEditable} : {artic
   else{
     return (
       <div className='mx-8'>
-        {
-          isEditable &&
-          <fetcher.Form method="post">
-            <button className="rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 transition items-center flex justify-center w-20 h-8" onClick={onClick} type="submit"> Saglabāt </button>
-            <input type="hidden" name="contentJson" value={contentJson} />
-            <input type="hidden" name="articleId" value={articleId} />
-          </fetcher.Form>
-        }
         {
           isEditable &&
           <>
@@ -134,6 +131,17 @@ export default function NewsEditor({articleId, articleJson, isEditable} : {artic
           {
             isEditable &&
             <MenuBar editor={editor} />
+          }
+          {
+            isEditable &&
+            <div className='flex flex-row items-center'>
+              <button onClick={onClick} className="px-3 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700">{saveTitle}</button>
+              <div className='ml-3 text-xs'> 
+                {
+                  isSaved ? "Jūsu izmaiņas ir saglabātas un publiski pieejamas" : "Jūsu izmaiņas nav saglabātas"
+                }
+              </div>
+            </div>
           }
           <EditorContent className="m-2" editor={editor} />
         </div>
