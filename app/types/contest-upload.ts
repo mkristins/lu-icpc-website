@@ -37,3 +37,21 @@ export interface ContestantSelect{
   id: number;
   name: string;
 }
+
+export interface MemberInfo{
+    id?: number,
+    name: string
+}
+
+export interface TeamInfo{
+    contextId: number,
+    teamId?: number,
+    name: string,
+    member1: MemberInfo,
+    member2: MemberInfo,
+    member3: MemberInfo
+    rank: number,
+    points: number,
+    penalty: number,
+    medalIndex: number
+}

@@ -56,15 +56,17 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
     </div>
     <div className="m-8">
       {isTeamMode &&
-          <div>
+          <div className="flex justify-center">
             <table>
               <thead className="border font-bold">
-                <th className="px-3 py-2 border">Komanda</th>
-                <th className="px-3 py-2 border">Dalības</th>
-                <th className="px-3 py-2 border">Zelts</th>
-                <th className="px-3 py-2 border">Sudrabs</th>
-                <th className="px-3 py-2 border">Bronza</th>
-                <th className="px-3 py-2 border">Medaļas kopā</th>
+                <tr>
+                  <th className="px-3 py-2 border">Komanda</th>
+                  <th className="px-3 py-2 border">Dalības</th>
+                  <th className="px-3 py-2 border">Zelts</th>
+                  <th className="px-3 py-2 border">Sudrabs</th>
+                  <th className="px-3 py-2 border">Bronza</th>
+                  <th className="px-3 py-2 border">Medaļas kopā</th>
+                </tr>
               </thead>
               <tbody>
                 {
@@ -84,15 +86,17 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
           </div>
       }
       {
-        !isTeamMode && <div>
+        !isTeamMode && <div className="flex justify-center">
         <table>
           <thead className="border font-bold">
-            <th className="px-3 py-2 border">Dalībnieks</th>
-            <th className="px-3 py-2 border">Dalības</th>
-            <th className="px-3 py-2 border">Zelts</th>
-            <th className="px-3 py-2 border">Sudrabs</th>
-            <th className="px-3 py-2 border">Bronza</th>
-            <th className="px-3 py-2 border">Medaļas kopā</th>
+            <tr>
+              <th className="px-3 py-2 border">Dalībnieks</th>
+              <th className="px-3 py-2 border">Dalības</th>
+              <th className="px-3 py-2 border">Zelts</th>
+              <th className="px-3 py-2 border">Sudrabs</th>
+              <th className="px-3 py-2 border">Bronza</th>
+              <th className="px-3 py-2 border">Medaļas kopā</th>
+            </tr>
           </thead>
           <tbody>
             {

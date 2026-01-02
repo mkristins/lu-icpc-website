@@ -43,12 +43,14 @@ export default function TeamProfile({loaderData} : Route.ComponentProps){
             <div>
                 <table>
                     <thead>
-                        <th className="border font-bold px-3 py-2">Datums</th>
-                        <th className="border font-bold px-3 py-2">Sacensības</th>
-                        <th className="border font-bold px-3 py-2">Vieta</th>
-                        <th className="border font-bold px-3 py-2">Medaļa</th>
-                        <th className="border font-bold px-3 py-2">Punkti</th>
-                        <th className="border font-bold px-3 py-2">Soda minūtes</th>
+                        <tr>
+                            <th className="border font-bold px-3 py-2">Datums</th>
+                            <th className="border font-bold px-3 py-2">Sacensības</th>
+                            <th className="border font-bold px-3 py-2">Vieta</th>
+                            <th className="border font-bold px-3 py-2">Medaļa</th>
+                            <th className="border font-bold px-3 py-2">Punkti</th>
+                            <th className="border font-bold px-3 py-2">Soda minūtes</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {loaderData.participations.map((participation) => {

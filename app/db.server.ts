@@ -1,7 +1,7 @@
 import { PrismaClient } from "generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Prisma } from "generated/prisma/client";
-import type { UploadSubmissionData, UploadTeamData } from "./types/contest-upload";
+import type { TeamInfo, UploadSubmissionData, UploadTeamData } from "./types/contest-upload";
 import { uploadAlbumImage, uploadPDF } from "./files.server";
 
 const adapter = new PrismaPg({
@@ -49,6 +49,9 @@ export async function updateNewsArticle(id: string, newText : string){
 
 export async function fetchAllContests(){
     let contests = await prisma.contest.findMany({
+        where: {
+            isLocal: true
+        },
         orderBy: {
             year: 'desc'
         }
@@ -384,6 +387,91 @@ export async function uploadLocalContest(
         }
     })
 }   
+
+export async function uploadContestSuccess(teamInfo : TeamInfo[], year : number, contestName : string) {
+    
+    const dbContest = await prisma.contest.create({
+        data: {
+            name: contestName,
+            isLocal : false,
+            year : year,
+            from: new Date(),
+            to : new Date()
+        }
+    })
+    const dbTeams = await Promise.all(
+        teamInfo.map(async t => {
+            if(t.teamId){
+            
+                await prisma.teamParticipation.create({
+                    data : {
+                        teamId: t.teamId,
+                        contestId: dbContest.id,
+                        rank: t.rank,
+                        solvedTasks: t.points,
+                        penalty: t.penalty,
+                        medalIndex: t.medalIndex,
+                    }
+                })
+            }
+            else{
+                const dbTeam = await prisma.team.create({
+                    data : {
+                        name: t.name
+                    }
+                })
+                if(t.member1.name){
+                    const contestant1 = await prisma.contestant.create({
+                        data : {
+                            name: t.member1.name
+                        }
+                    })
+                    await prisma.teamMember.create({
+                        data : {
+                            teamId: dbTeam.id,
+                            contestantId: contestant1.id
+                        }
+                    })
+                }
+                if(t.member2.name){
+                    const contestant2 = await prisma.contestant.create({
+                        data : {
+                            name: t.member2.name
+                        }
+                    })
+                    await prisma.teamMember.create({
+                        data : {
+                            teamId: dbTeam.id,
+                            contestantId: contestant2.id
+                        }
+                    })
+                }
+                if(t.member3.name){
+                    const contestant3 = await prisma.contestant.create({
+                        data : {
+                            name: t.member3.name
+                        }
+                    })
+                    await prisma.teamMember.create({
+                        data : {
+                            teamId: dbTeam.id,
+                            contestantId: contestant3.id
+                        }
+                    })
+                }
+                await prisma.teamParticipation.create({
+                    data : {
+                        teamId: dbTeam.id,
+                        contestId: dbContest.id,
+                        rank: t.rank,
+                        solvedTasks: t.points,
+                        penalty: t.penalty
+                    }
+                })
+            }
+        })
+    )
+}
 
 export async function uploadAlbum(title : string, files : File[]){
     const album = await prisma.album.create({

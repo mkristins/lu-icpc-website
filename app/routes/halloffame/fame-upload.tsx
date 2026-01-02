@@ -1,11 +1,11 @@
 import Header from "~/shared/header";
 import type { Route } from "./+types/fame-upload";
 import { isAuthorized } from "~/auth.server";
-import { Link, redirect } from "react-router";
+import { Link, redirect, useFetcher } from "react-router";
 import { useState } from "react";
-import { fetchContestants, fetchTeamsWithMembers } from "~/db.server";
+import { fetchContestants, fetchTeamsWithMembers, uploadContestSuccess } from "~/db.server";
 import TeamSearchCell from "~/components/team-search";
-import type { TeamSelect } from "~/types/contest-upload";
+import type { MemberInfo, TeamInfo, TeamSelect } from "~/types/contest-upload";
 import ContestantSearchCell from "~/components/contestant-search";
 import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
 
@@ -21,25 +21,21 @@ export async function loader({request} : Route.LoaderArgs){
     }
 }
 
-interface MemberInfo{
-    id?: number,
-    name: string
-}
+export async function action({request} : {request : Request}) {
+    const json = await request.json()
 
-interface TeamInfo{
-    contextId: number,
-    teamId?: number,
-    name: string,
-    member1: MemberInfo,
-    member2: MemberInfo,
-    member3: MemberInfo
-    rank: number,
-    points: number,
-    penalty: number,
-    medalIndex: number
+    const teams = json.teamInfo
+    const year = json.year
+    const constestName = json.contestName
+
+    await uploadContestSuccess(teams, year, constestName)
+    return redirect("/halloffame")
 }
 
 export default function FameUpload({loaderData} : Route.ComponentProps){
+
+    const fetcher = useFetcher()
+
     const [teamInfo, setTeamInfo] = useState<TeamInfo[]>([
         {
             contextId: 1,
@@ -66,6 +62,18 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
             penalty: 555,
             medalIndex: 3
         }])
+    }
+
+    function publishResults(){
+        fetcher.submit(JSON.stringify({
+            teamInfo: teamInfo,
+            year: year,
+            contestName: contestName
+        }),
+        {
+            method: "post",
+            encType: "application/json"
+        })
     }
 
     const [editingId, setEditingId] = useState<number | null>(null)
@@ -99,7 +107,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                     id : t.members[2].contestant.id,
                     name : t.members[2].contestant.name ? t.members[2].contestant.name : ""
                 } : {name: ""}
-                return {...team, teamId: team.contextId, name: t.name, member1: newMember1, member2: newMember2, member3: newMember3}
+                return {...team, teamId: t.id, name: t.name, member1: newMember1, member2: newMember2, member3: newMember3}
             }
             else{
                 return {...team}
@@ -210,8 +218,18 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
         }))
     }
 
+    function onTeamMedalChange(event : React.ChangeEvent<HTMLInputElement>){
+        setTeamInfo(teamInfo.map((team) => {
+            if(team.contextId == editingId){
+                return {...team, medalIndex: parseInt(event.target.value)}
+            }
+            else{
+                return team
+            }
+        }))
+    }
     const [contestName, setContestName] = useState("CERC")
-
+    const [year, setYear] = useState(0)
     return <div>
         <Header />
         <div>
@@ -219,13 +237,22 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
             <div className="font-bold text-black text-2xl mx-8">
                 Pievienot starptautiskos panākumus!
             </div>
-            <div className="mx-8">
+            <div className="mx-8 font-bold text-xl">
                 Sacensības
             </div>
             <input
-                className="border mx-8 h-10 w-64 m-2"
+                className="border mx-8 h-10 w-64 m-2 px-3 py-2"
                 value={contestName}
                 onChange={(e) => setContestName(e.target.value)}
+            />
+            <div className="mx-8 font-bold text-xl">
+                Gads
+            </div>
+            <input
+                className="border mx-8 h-10 w-64 m-2 px-3 py-2"
+                inputMode="numeric"
+                value={year}
+                onChange={(e) => setYear(e.target.value ? parseInt(e.target.value) : 0)}
             />
             <table className="mx-8">
                 <thead className="border font-bold">
@@ -305,7 +332,14 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                         onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamPenaltyChange(e)}
                                     />
                                 </td>
-                                <td className="px-3 py-2 border">{team.medalIndex}</td>
+                                <td className="px-3 py-2 border">
+                                    <input 
+                                        value={team.medalIndex}
+                                        inputMode="numeric"
+                                        onFocus={() => setEditingId(team.contextId)}
+                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMedalChange(e)}
+                                    />
+                                </td>
                             </RowHighlighting>
                         })
                     }
@@ -315,7 +349,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                 <button onClick={addTeam} className="bg-black hover:bg-slate-900 text-white px-3 py-2 rounded-xl mx-8 mt-2">
                     Pievienot
                 </button>
-                <button className="bg-black text-white px-3 py-2 rounded-xl mx-8 mt-2">
+                <button onClick={publishResults} className="bg-black text-white px-3 py-2 rounded-xl mx-8 mt-2">
                     Publicēt
                 </button>   
             </div>
