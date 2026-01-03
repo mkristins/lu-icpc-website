@@ -23,6 +23,7 @@ model AdminUser {
 
 model NewsArticle {
   id    Int    @id @default(autoincrement())
+  date DateTime
   title String
   text  String
 }
@@ -30,9 +31,7 @@ model NewsArticle {
 model Contest {
   id    Int           @id @default(autoincrement())
   name String
-  year  Int
-  from  DateTime
-  to    DateTime
+  date DateTime
   isLocal Boolean
   pdfLink String?
   tasks ContestTask[]
@@ -97,6 +96,7 @@ model Contestant {
 
 model Album{
   id Int @id @default(autoincrement())
+  date DateTime
   title String
   photos AlbumPhoto[]
 }

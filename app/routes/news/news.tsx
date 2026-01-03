@@ -34,7 +34,7 @@ export default function News({loaderData} : Route.ComponentProps) {
         </AdminWrap>
         {
             loaderData.articles.map((article) => {
-                return <ArticleLink key={article.id} title={article.title} date="12/12/2025" articleId={article.id}/>
+                return <ArticleLink key={article.id} title={article.title} date={article.date} articleId={article.id}/>
             })
         }
     </div>;

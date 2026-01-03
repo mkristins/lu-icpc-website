@@ -35,7 +35,7 @@ export default function Archive({loaderData} : Route.ComponentProps) {
     <div className="flex flex-col">
       {
       loaderData.contests.map(contest => {
-        return <ArchiveLink year={contest.year} key={contest.id} resultLink={`./scoreboard/${contest.id}`} taskLink={`${STORAGE_URL}/${contest.pdfLink}`}/>
+        return <ArchiveLink year={contest.date.getFullYear()} key={contest.id} resultLink={`./scoreboard/${contest.id}`} taskLink={`${STORAGE_URL}/${contest.pdfLink}`}/>
       })
     }
     </div>

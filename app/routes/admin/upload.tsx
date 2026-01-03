@@ -11,6 +11,8 @@ import TeamSearchCell from "~/components/team-search";
 import type { Route } from "./+types/upload";
 import ContestantSearchCell from "~/components/contestant-search";
 import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
+import {DayPicker} from "react-day-picker";
+import "react-day-picker/style.css";
 
 export async function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -39,7 +41,7 @@ export async function action({request} : {request : Request}){
             const teams = JSON.parse(String(form.get("teams") || "[]"));
             const problems = JSON.parse(String(form.get("problems") || "[]"));
             const submissions = JSON.parse(String(form.get("submissions") || "[]"));
-
+            const date = new Date(String(form.get("date")))
             const pdf = form.get("pdf"); // File | null
             if (!(pdf instanceof File) || pdf.size === 0) {
                 return {}
@@ -50,9 +52,7 @@ export async function action({request} : {request : Request}){
                 submissions,
                 problems,
                 pdf,
-                year,
-                new Date(),
-                new Date()
+                date
             );
             return redirect("/archive")
         }
@@ -127,32 +127,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
     const [editingId, setEditingId] = useState<number | null>(null)
     const problemList = computeProblemList(fetcher.data)
     const submissionList = computeSubmissionList(fetcher.data)
-    function onTeamNameChange(event : React.ChangeEvent<HTMLInputElement>){
-        setTeamList(teamList.map((team) => {
-            if(team.participantId == editingId){
-                return {...team, teamName: event.target.value}
-            }
-            else{
-                return team
-            }
-        }))
-    }
-
-    function onTeamMemberChange(memberId : number, event : React.ChangeEvent<HTMLInputElement>){
-        setTeamList(teamList.map((team) => {
-            if(team.participantId == editingId){
-                if(memberId == 1)
-                    return {...team, teamId: undefined, member1: {name: event.target.value}}
-                else if(memberId == 2)
-                    return {...team, teamId: undefined, member2: {name: event.target.value}}
-                else
-                    return {...team, teamId: undefined, member3: {name: event.target.value}}
-            }
-            else{
-                return team
-            }
-        }))
-    }
 
     function submitUpdates(){
         const formData = new FormData();
@@ -161,7 +135,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
         formData.append("teams", JSON.stringify(teamList))
         formData.append("submissions", JSON.stringify(submissionList))
         formData.append("problems", JSON.stringify(problemList))
-        formData.append("year", year)
+        formData.append("date", date.toISOString())
         if(pdfFile)
             formData.append("pdf", pdfFile)
         fetcher.submit(
@@ -209,10 +183,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                     contestantId : t.members[2].contestant.id,
                     name : t.members[2].contestant.name ? t.members[2].contestant.name : ""
                 } : {name: ""}
-                // return {...team, teamId: t.id, teamName: t.name, member1: {
-                //     contestantId: t.members[0].contestant.id,
-                //     name: t.members[1].contestant.name ? t.members[1].contestant.name : ""
-                // }}
                 return {...team, teamId: t.id, teamName: t.name, member1: newMember1, member2: newMember2, member3: newMember3}
             }
             else{
@@ -294,7 +264,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
 
     const [pdfFile, setPdfFile] = useState<File | null>(null)
     const [title, setTitle] = useState("")
-    const [year, setYear] = useState("")
+    const [date, setDate] = useState(new Date())
     const [apiKey, setApiKey] = useState("")
     const [apiSecret, setApiSecret] = useState("")
     const [contestNumber, setContestNumber] = useState("")
@@ -307,20 +277,21 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
             <Form className="flex flex-col">
                 <InputComponent name="contestName" placeholder="Sacensību nosaukums" value={title} setValue={setTitle} /> 
                 <PdfUploader onChange={setPdfFile}/>
-                {/* <input
-                    type="file"
-                    name="taskPDF"
-                    required
-                    className="border w-48 h-10 m-2 flex flex-col items-center justify-center"
-                /> */}
-                <InputComponent name="year" placeholder="Gads" value={year} setValue={setYear} /> 
+                <div className="font-bold text-xl"> Izvēlieties datumu! </div>
+                <DayPicker
+                    className="h-[350px]"
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    required={true}
+               />
             </Form>
             <div className="flex flex-col">
-                <div> Ielāde no "Codeforces" </div>
+                <div className="flex font-bold"> Dati ielāde no "Codeforces" </div>
                 <NewInputComponent value={apiKey} placeholder="Codeforces API atslēga" setValue={setApiKey}/>
                 <NewInputComponent value={apiSecret} placeholder="Codeforces API noslēpums" setValue={setApiSecret}/>
                 <NewInputComponent value={contestNumber} placeholder="Codeforces sacensību ID" setValue={setContestNumber}/>
-                <button onClick={requestCodeforcesData} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded-xl font-bold m-2">
+                <button onClick={requestCodeforcesData} className="border bg-slate-900 hover:bg-slate-800 w-48 h-10 rounded-xl text-white text-sm m-2">
                     Ielādēt no Codeforces!
                 </button>
             </div>
@@ -354,15 +325,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                                         onType={onType}
                                     />
                                 </td>
-                                {/* <td className="border px-3 py-2 text-left">
-                                    A
-                                </td>
-                                <td className="border px-3 py-2 text-left">
-                                    B
-                                </td>
-                                <td className="border px-3 py-2 text-left">
-                                    C
-                                </td> */}
                                 <CellHighlighting highlight={!!team.member1.contestantId && !team.teamId}>
                                     <ContestantSearchCell 
                                         allContestants={loaderData.contestants}
@@ -371,11 +333,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                                         onPick={(t : ContestantSelect) => selectContestant(t, 1)}
                                         onType={(t : string) => onTypeContestant(t, 1)}
                                     />
-                                    {/* <input 
-                                        value={team.member1.name}
-                                        onFocus={() => setEditingId(team.participantId)}
-                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMemberChange(1, e)}
-                                    /> */}
                                 </CellHighlighting>
                                 <CellHighlighting highlight={!!team.member2.contestantId && !team.teamId}>
                                     <ContestantSearchCell 

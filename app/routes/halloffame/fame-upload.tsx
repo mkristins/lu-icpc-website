@@ -9,6 +9,8 @@ import type { MemberInfo, TeamInfo, TeamSelect } from "~/types/contest-upload";
 import ContestantSearchCell from "~/components/contestant-search";
 import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
 import MedalSelect from "~/components/medal-select";
+import {DayPicker} from "react-day-picker";
+import "react-day-picker/style.css";
 
 export async function loader({request} : Route.LoaderArgs){
     if(!isAuthorized(request)){
@@ -26,10 +28,10 @@ export async function action({request} : {request : Request}) {
     const json = await request.json()
 
     const teams = json.teamInfo
-    const year = json.year
+    const date = new Date(json.date)
     const constestName = json.contestName
 
-    await uploadContestSuccess(teams, year, constestName)
+    await uploadContestSuccess(teams, date, constestName)
     return redirect("/halloffame")
 }
 
@@ -68,7 +70,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
     function publishResults(){
         fetcher.submit(JSON.stringify({
             teamInfo: teamInfo,
-            year: year,
+            date: date,
             contestName: contestName
         }),
         {
@@ -78,18 +80,6 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
     }
 
     const [editingId, setEditingId] = useState<number | null>(null)
-
-    function onTeamNameChange(event : React.ChangeEvent<HTMLInputElement>){
-        setTeamInfo(teamInfo.map((team) => {
-            if(team.contextId == editingId){
-                return {...team, name: event.target.value}
-            }
-            else{
-                return team
-            }
-        }))
-    }
-
 
     function onTeamChange(t : TeamSelect){
         setTeamInfo(teamInfo.map((team) => {
@@ -230,7 +220,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
         }))
     }
     const [contestName, setContestName] = useState("CERC")
-    const [year, setYear] = useState(0)
+    const [date, setDate] = useState(new Date())
     return <div>
         <Header />
         <div>
@@ -246,15 +236,20 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                 value={contestName}
                 onChange={(e) => setContestName(e.target.value)}
             />
-            <div className="mx-8 font-bold text-xl">
-                Gads
-            </div>
-            <input
+            <div className="font-bold text-xl mx-8"> Izvēlieties datumu! </div>
+            <DayPicker
+                className="h-[350px] mx-8"
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                required={true}
+            />
+            {/* <input
                 className="border mx-8 h-10 w-64 m-2 px-3 py-2"
                 inputMode="numeric"
                 value={year}
                 onChange={(e) => setYear(e.target.value ? parseInt(e.target.value) : 0)}
-            />
+            /> */}
             <table className="mx-8">
                 <thead className="border font-bold">
                     <tr>
@@ -335,12 +330,6 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                 </td>
                                 <td className="px-3 py-2 border">
                                     <MedalSelect index={team.medalIndex} onFocus={() => setEditingId(team.contextId)} onChange={onTeamMedalChange}/>
-                                    {/* <input 
-                                        value={team.medalIndex}
-                                        inputMode="numeric"
-                                        onFocus={() => setEditingId(team.contextId)}
-                                        onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMedalChange(e)}
-                                    /> */}
                                 </td>
                             </RowHighlighting>
                         })

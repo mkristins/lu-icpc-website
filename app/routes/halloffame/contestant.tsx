@@ -56,7 +56,7 @@ export default function ContestantProfile({loaderData} : Route.ComponentProps){
                     <tbody>
                         {participationList.map((participation) => {
                             return <tr key={participation.id}>
-                                <td className="border font-bold px-3 py-2">{participation.contest.year}</td>
+                                <td className="border font-bold px-3 py-2">{participation.contest.date.toDateString()}</td>
                                 <td className="border px-3 py-2">{participation.contest.name}</td>
                                 <td className="border px-3 py-2">
                                     <Link className="text-blue-500" to={`/halloffame/team/${participation.teamId}`}>

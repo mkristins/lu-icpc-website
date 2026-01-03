@@ -53,7 +53,7 @@ export default function TeamProfile({loaderData} : Route.ComponentProps){
                     <tbody>
                         {loaderData.participations.map((participation) => {
                             return <tr key={participation.id}>
-                                    <td className="border font-bold px-3 py-2">{participation.contest.year}</td>
+                                    <td className="border font-bold px-3 py-2">{participation.contest.date.toDateString()}</td>
                                     <td className="border px-3 py-2">{participation.contest.name}</td>
                                     <td className="border px-3 py-2">{participation.rank}</td>
                                     <td className="border px-3 py-2">{participation.medalIndex > 0 && `${MedalTypes[participation.medalIndex].icon}${MedalTypes[participation.medalIndex].label}`}</td>

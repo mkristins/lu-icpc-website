@@ -33,7 +33,11 @@ async function main() {
   // -------------------------
   const articles = await prisma.newsArticle.createMany({
     data: [
-        { title: "Team 1 wins", text: '{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"LU dalība CERC\"}]},{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"LU komandas CERC pusfinālā izcīna attiecīgi 7. un 35. vietu.\"}]},{\"type\":\"paragraph\"}]}'},
+        { 
+          title: "Team 1 wins", 
+          text: '{\"type\":\"doc\",\"content\":[{\"type\":\"heading\",\"attrs\":{\"level\":2},\"content\":[{\"type\":\"text\",\"text\":\"LU dalība CERC\"}]},{\"type\":\"heading\",\"attrs\":{\"level\":1},\"content\":[{\"type\":\"text\",\"text\":\"LU komandas CERC pusfinālā izcīna attiecīgi 7. un 35. vietu.\"}]},{\"type\":\"paragraph\"}]}',
+          date: new Date("2026-12-16T00:00:00.000Z")
+        },
     ]
   })
   // -------------------------
@@ -96,9 +100,7 @@ async function main() {
   // -------------------------
   const contest2024 = await prisma.contest.create({
     data: {
-      year: 2024,
-      from: new Date("2024-06-01T09:00:00Z"),
-      to: new Date("2024-06-01T14:00:00Z"),
+      date: new Date("2026-12-16T00:00:00.000Z"),
       name: "LU Atlase 2024",
       isLocal: true,
       pdfLink: "competition-archive/2010/euc2025-official.pdf",
@@ -115,9 +117,7 @@ async function main() {
 
   const contest2025 = await prisma.contest.create({
     data: {
-      year: 2025,
-      from: new Date("2025-06-01T09:00:00Z"),
-      to: new Date("2025-06-01T14:00:00Z"),
+      date: new Date("2026-12-16T00:00:00.000Z"),
       name: "LU Atlase 2025",
       isLocal: true,
     },
@@ -255,6 +255,7 @@ async function main() {
   // -------------
   const album1 = await prisma.album.create({
     data : {
+      date: new Date("2026-12-16T00:00:00.000Z"),
       title: "CERC 2025",
       photos: {
         create: [
@@ -268,6 +269,7 @@ async function main() {
 
   const album2 = await prisma.album.create({
     data : {
+      date: new Date("2026-12-18T00:00:00.000Z"),
       title: "CERC 2025 v2",
       photos: {
         create: [

@@ -9,18 +9,6 @@ const adapter = new PrismaPg({
 });
 
 const prisma = new PrismaClient({adapter})
-const data: Prisma.NewsArticleCreateInput[] = [
-    {
-        title: "LU programmētāji iegūst sudrabu ICPC pusfinālā",
-        text: "Patiess notikums."
-    }
-]
-
-export async function creator() {
-    for (const u of data) {
-        await prisma.newsArticle.create({ data: u });
-    }
-}
 
 export async function fetchAllNewsArticles() {
     let articles = await prisma.newsArticle.findMany()
@@ -52,7 +40,8 @@ export async function createNewsArticle(title : string, text : string){
     await prisma.newsArticle.create({
         data : {
             title: title,
-            text: text
+            text: text,
+            date: new Date()
         }
     })
 }
@@ -63,7 +52,7 @@ export async function fetchAllContests(){
             isLocal: true
         },
         orderBy: {
-            year: 'desc'
+            date: 'desc'
         }
     })
     return contests
@@ -150,7 +139,7 @@ export async function fetchTeamProfile(id: number) {
             participations : {
                 orderBy: {
                     contest: {
-                        year: 'desc',
+                        date: 'desc',
                     },
                 },
                 include : {
@@ -175,7 +164,7 @@ export async function fetchContestantProfile(id: number) {
                             participations : {
                                 orderBy: {
                                     contest: {
-                                        year: 'desc',
+                                        date: 'desc',
                                     },
                                 },
                                 include : {
@@ -279,9 +268,7 @@ export async function uploadLocalContest(
     submissions : UploadSubmissionData[],
     problems : string[],
     pdfFile : File,
-    year : number,
-    dateFrom : Date,
-    dateTo : Date
+    date: Date
 ){
     const pdfUrl = await uploadPDF(pdfFile);
     
@@ -290,9 +277,7 @@ export async function uploadLocalContest(
             name: contestName,
             isLocal : true,
             pdfLink: pdfUrl,
-            year : year,
-            from: dateFrom,
-            to : dateTo
+            date : date
         }
     })
 
@@ -398,15 +383,13 @@ export async function uploadLocalContest(
     })
 }   
 
-export async function uploadContestSuccess(teamInfo : TeamInfo[], year : number, contestName : string) {
+export async function uploadContestSuccess(teamInfo : TeamInfo[], date : Date, contestName : string) {
     
     const dbContest = await prisma.contest.create({
         data: {
             name: contestName,
             isLocal : false,
-            year : year,
-            from: new Date(),
-            to : new Date()
+            date : date
         }
     })
     const dbTeams = await Promise.all(
@@ -486,7 +469,8 @@ export async function uploadContestSuccess(teamInfo : TeamInfo[], year : number,
 export async function uploadAlbum(title : string, files : File[]){
     const album = await prisma.album.create({
         data : {
-            title: title
+            title: title,
+            date: new Date()
         }
     })
     for(const f of files){

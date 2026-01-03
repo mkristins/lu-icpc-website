@@ -30,10 +30,6 @@ function ToggleButton({highlight, onClick, children} : {highlight : boolean, onC
   }
 }
 
-// function TeamsStandings({te){
-
-// }
-
 export default function HallOfFame({loaderData} : Route.ComponentProps) {
   const [isTeamMode, setIsTeamMode] = useState(true)
   return <div>
