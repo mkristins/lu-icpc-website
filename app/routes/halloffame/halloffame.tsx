@@ -74,9 +74,9 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
                     return <tr key={team.id}>
                       <td className="px-3 py-2 border"><Link className="text-md text-blue-500" to={`./team/${team.id}`}>{team.name}</Link> </td>
                       <td className="px-3 py-2 border">{team.participations}</td>
-                      <td className="px-3 py-2 border">{team.gold}</td>
-                      <td className="px-3 py-2 border">{team.silver}</td>
-                      <td className="px-3 py-2 border">{team.bronze}</td>
+                      <td className="px-3 py-2 border bg-amber-400">{team.gold}</td>
+                      <td className="px-3 py-2 border bg-slate-500">{team.silver}</td>
+                      <td className="px-3 py-2 border bg-red-900">{team.bronze}</td>
                       <td className="px-3 py-2 border">{team.participations}</td>
                     </tr>
                   })
@@ -104,9 +104,9 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
                 return <tr key={contestant.id}>
                   <td className="px-3 py-2 border"><Link className="text-md text-blue-500" to={`./contestant/${contestant.id}`}>{contestant.name}</Link> </td>
                   <td className="px-3 py-2 border">{contestant.participations}</td>
-                  <td className="px-3 py-2 border">{contestant.gold}</td>
-                  <td className="px-3 py-2 border">{contestant.silver}</td>
-                  <td className="px-3 py-2 border">{contestant.bronze}</td>
+                  <td className="px-3 py-2 border bg-amber-400">{contestant.gold}</td>
+                  <td className="px-3 py-2 border bg-slate-500">{contestant.silver}</td>
+                  <td className="px-3 py-2 border bg-red-900">{contestant.bronze}</td>
                   <td className="px-3 py-2 border">{contestant.participations}</td>
                 </tr>
               })

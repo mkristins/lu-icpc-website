@@ -8,6 +8,7 @@ import TeamSearchCell from "~/components/team-search";
 import type { MemberInfo, TeamInfo, TeamSelect } from "~/types/contest-upload";
 import ContestantSearchCell from "~/components/contestant-search";
 import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
+import MedalSelect from "~/components/medal-select";
 
 export async function loader({request} : Route.LoaderArgs){
     if(!isAuthorized(request)){
@@ -218,10 +219,10 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
         }))
     }
 
-    function onTeamMedalChange(event : React.ChangeEvent<HTMLInputElement>){
+    function onTeamMedalChange(index : number){
         setTeamInfo(teamInfo.map((team) => {
             if(team.contextId == editingId){
-                return {...team, medalIndex: parseInt(event.target.value)}
+                return {...team, medalIndex: index}
             }
             else{
                 return team
@@ -333,12 +334,13 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                     />
                                 </td>
                                 <td className="px-3 py-2 border">
-                                    <input 
+                                    <MedalSelect index={team.medalIndex} onFocus={() => setEditingId(team.contextId)} onChange={onTeamMedalChange}/>
+                                    {/* <input 
                                         value={team.medalIndex}
                                         inputMode="numeric"
                                         onFocus={() => setEditingId(team.contextId)}
                                         onChange={(e : React.ChangeEvent<HTMLInputElement>) => onTeamMedalChange(e)}
-                                    />
+                                    /> */}
                                 </td>
                             </RowHighlighting>
                         })

@@ -2,6 +2,7 @@ import { fetchTeamProfile } from "~/db.server"
 import type { Route } from "./+types/team"
 import Header from "~/shared/header"
 import { Link } from "react-router"
+import { MedalTypes } from "~/types/medals"
 
 export async function loader({params} : Route.LoaderArgs){
     const teamId = params.id
@@ -20,9 +21,6 @@ export default function TeamProfile({loaderData} : Route.ComponentProps){
     }
     return <div>
         <Header />
-        <div className="mx-8 font-bold text-2xl">
-            Komandas profils
-        </div>
         <div className="mx-8 font-bold text-2xl flex justify-center">
             {loaderData.name}
         </div>
@@ -58,7 +56,7 @@ export default function TeamProfile({loaderData} : Route.ComponentProps){
                                     <td className="border font-bold px-3 py-2">{participation.contest.year}</td>
                                     <td className="border px-3 py-2">{participation.contest.name}</td>
                                     <td className="border px-3 py-2">{participation.rank}</td>
-                                    <td className="border px-3 py-2">{participation.medalIndex}</td>
+                                    <td className="border px-3 py-2">{participation.medalIndex > 0 && `${MedalTypes[participation.medalIndex].icon}${MedalTypes[participation.medalIndex].label}`}</td>
                                     <td className="border px-3 py-2">{participation.solvedTasks}</td>
                                     <td className="border px-3 py-2">{participation.penalty}</td>
                                 </tr>
