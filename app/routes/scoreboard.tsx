@@ -180,7 +180,7 @@ export default function Scoreboard({loaderData} : Route.ComponentProps) {
                         <th className="border px-4 py-2 text-left font-semibold"> Soda minūtes </th>
                     </tr>
                 </thead>
-                <tbody className="bg-gray-500">
+                <tbody>
                     {
                         teamsInfo.map((team) => {
                             return <tr key={team.id}>
