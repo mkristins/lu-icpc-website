@@ -518,7 +518,8 @@ export async function uploadContestSuccess(teamInfo : TeamInfo[], date : Date, c
                         contestId: dbContest.id,
                         rank: t.rank,
                         solvedTasks: t.points,
-                        penalty: t.penalty
+                        penalty: t.penalty,
+                        medalIndex: t.medalIndex
                     }
                 })
             }
