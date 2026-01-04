@@ -42,28 +42,28 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
     const [teamInfo, setTeamInfo] = useState<TeamInfo[]>([
         {
             contextId: 1,
-            name : "Skrupulozās zemenītes",
-            member1: {name: "MK"},
-            member2: {name: "KŠ"},
-            member3: {name: "VK"},
-            rank: 7,
-            points: 8,
-            penalty: 518,
-            medalIndex: 2
-        },
+            name : "Paraugkomanda",
+            member1: {name: ""},
+            member2: {name: ""},
+            member3: {name: ""},
+            rank: 0,
+            points: 0,
+            penalty: 0,
+            medalIndex: 0
+        }
     ])
 
     function addTeam(){
         setTeamInfo([...teamInfo, {
             contextId: teamInfo.length + 1,
-            name : "Neskrupulozās zemenītes",
-            member1: {name: "MK"},
-            member2: {name: "KŠ"},
-            member3: {name: "VK"},
-            rank: 1,
-            points: 1,
-            penalty: 555,
-            medalIndex: 3
+            name : "Paraugkomanda",
+            member1: {name: ""},
+            member2: {name: ""},
+            member3: {name: ""},
+            rank: 0,
+            points: 0,
+            penalty: 0,
+            medalIndex: 0
         }])
     }
 
@@ -219,6 +219,10 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
             }
         }))
     }
+
+    function removeTeam(contextId : number){
+        setTeamInfo(teamInfo.filter((team) => team.contextId != contextId))
+    }
     const [contestName, setContestName] = useState("CERC")
     const [date, setDate] = useState(new Date())
     return <div>
@@ -261,6 +265,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                         <th className="px-3 py-2 border">Uzdevumu skaits</th>
                         <th className="px-3 py-2 border">Soda minūtes</th>
                         <th className="px-3 py-2 border">Medaļa</th>
+                        <th className="px-3 py-2 border"> </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -331,16 +336,25 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                 <td className="px-3 py-2 border">
                                     <MedalSelect index={team.medalIndex} onFocus={() => setEditingId(team.contextId)} onChange={onTeamMedalChange}/>
                                 </td>
+                                <td className="px-3 py-2 border text-xs text-slate-900">
+                                    <button
+                                        onClick={() => removeTeam(team.contextId)}
+                                    >
+                                        Noņemt
+                                    </button>
+                                </td>
                             </RowHighlighting>
                         })
                     }
                 </tbody>
             </table>
-            <div className="flex flex-col justify-start w-48">
-                <button onClick={addTeam} className="bg-black hover:bg-slate-900 text-white px-3 py-2 rounded-xl mx-8 mt-2">
+            <div className="flex flex-row justify-end">
+                <button onClick={addTeam} className="bg-black hover:bg-slate-900 text-white px-3 py-2 rounded-xl text-xs mx-8 mt-2">
                     Pievienot
                 </button>
-                <button onClick={publishResults} className="bg-black text-white px-3 py-2 rounded-xl mx-8 mt-2">
+            </div>
+            <div className="flex flex-col justify-start w-48">
+                <button onClick={publishResults} className="bg-black text-white px-3 py-2 rounded-xl mx-8 my-4">
                     Publicēt
                 </button>   
             </div>

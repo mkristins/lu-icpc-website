@@ -100,7 +100,8 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                 teamName: `LU-${res.party.participantId}`,
                 participantId : res.party.participantId,
                 solvedProblems : res.points,
-                penalty : res.penalty 
+                penalty : res.penalty,
+                official: true 
             }
         })
     }
@@ -234,6 +235,17 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
         }))
     }
 
+    function setTeamOfficialStatus(participantId : number, official : boolean){
+        setTeamList(teamList.map((team) => {
+            if(team.participantId == editingId){
+                return {...team, official: official}
+            }
+            else{
+                return team
+            }
+        }))
+    }
+
     function onTypeContestant(name : string, index : number){
         setTeamList(teamList.map((team) => {
             if(team.participantId == editingId){
@@ -353,18 +365,21 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                                     />
                                 </CellHighlighting>
                                 <td className="border px-3 py-2 text-left"> {team.solvedProblems} </td>
-                                {team.teamId ?
-                                     <td className="border px-3 py-2 text-left bg-gray-200"> {team.penalty} </td> :
-                                     <td className="border px-3 py-2 text-left"> {team.penalty} </td>
-                                }
-                                
-                                <td className="border px-3 py-2 text-left"> Nē! </td>
+                                <td className="border px-3 py-2 text-left"> {team.penalty} </td>
+                                <td className="border px-3 py-2 text-left">
+                                    <input
+                                        className="w-6 h-6"
+                                        checked={team.official}
+                                        onChange={(e) => setTeamOfficialStatus(team.participantId, e.target.checked)} 
+                                        type="checkbox"
+                                    />
+                                </td>
                             </RowHighlighting>
                         })
                     }
                 </tbody>
             </table>
-            <button onClick={submitUpdates} className="border bg-green-500 hover:bg-green-600 w-48 h-10 rounded-xl font-bold m-2 mb-24">
+            <button onClick={submitUpdates} className="border bg-slate-900 hover:bg-slate-800 w-48 h-10 rounded-xl text-white text-sm m-2 mb-24">
                 Publicēt!
             </button>
         </div>

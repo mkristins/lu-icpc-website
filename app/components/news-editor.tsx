@@ -1,14 +1,13 @@
 import './styles.scss'
 
+import Image from '@tiptap/extension-image'
 import { TextStyleKit } from '@tiptap/extension-text-style'
 import type { Editor } from '@tiptap/react'
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useFetcher } from 'react-router'
 import type { UploadArticle } from '~/types/content'
-
-const extensions = [TextStyleKit, StarterKit]
 
 function MenuButton({onClick, disabled, children} : {onClick : () => void, disabled: boolean, children: React.ReactNode}) {
   return <button 
@@ -21,7 +20,24 @@ function MenuButton({onClick, disabled, children} : {onClick : () => void, disab
 }
 
 function MenuBar({ editor }: { editor: Editor }) {
-  // Read the current editor's state, and re-render the component when it changes
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    if(fetcher.data && fetcher.data.imgUrl){
+      const src = fetcher.data.imgUrl
+      editor.chain().focus().setImage({ src }).run()
+    }
+  }, [fetcher.data])
+
+  async function insertLocalImage(file: File) {
+      const formData = new FormData()
+      formData.append("img", file)
+      await fetcher.submit(formData, {
+        method: "post",
+        encType: "multipart/form-data"
+      })
+  }
   const editorState = useEditorState({
     editor,
     selector: ctx => {
@@ -60,34 +76,42 @@ function MenuBar({ editor }: { editor: Editor }) {
         >
           Strike
         </MenuButton>
-        <MenuButton
-          onClick={() => editor.chain().focus().setParagraph().run()}
-          disabled={false}
-        >
-          Paragraph
+
+        <MenuButton onClick={() => fileInputRef.current?.click()} disabled={false}>
+          Attēls
         </MenuButton>
-        <MenuButton
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          disabled={false}
-        >
-          H1
-        </MenuButton>
-        <MenuButton
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          disabled={false}
-        >
-          H2
-        </MenuButton>
+        
+        <input
+          className='border bg-amber-500 px-3 py-2 h-8 w-4'
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            insertLocalImage(file)
+            e.currentTarget.value = '' // allow same file re-pick
+          }}
+        />
       </div>
     </div>
   )
 }
 
-export default function NewsEditor({articleJson, articleTitle, isEditable, saveTitle, onSave} : {articleJson : string, articleTitle : string, isEditable : boolean, saveTitle : string, onSave : (arg: UploadArticle) => void}){
+export default function NewsEditor({articleJson, newArticle, articleTitle, isEditable, saveTitle, onSave} : {articleJson : string, newArticle : boolean, articleTitle : string, isEditable : boolean, saveTitle : string, onSave : (arg: UploadArticle) => void}){
   const fetcher = useFetcher()
   const [isSaved, setIsSaved] = useState(true)
   const [contentJson, setContentJson] = useState(articleJson)
   const [title, setTitle] = useState(articleTitle)
+
+  const extensions = [TextStyleKit, StarterKit, Image.configure({
+    resize: {
+      enabled: isEditable,
+      alwaysPreserveAspectRatio: true,
+    }
+  })]
+
   const editor = useEditor({
     extensions,
     content: JSON.parse(articleJson),
@@ -137,8 +161,8 @@ export default function NewsEditor({articleJson, articleTitle, isEditable, saveT
             <div className='flex flex-row items-center'>
               <button onClick={onClick} className="px-3 py-2 rounded-xl bg-slate-800 text-white hover:bg-slate-700">{saveTitle}</button>
               <div className='ml-3 text-xs'> 
-                {
-                  isSaved ? "Jūsu izmaiņas ir saglabātas un publiski pieejamas" : "Jūsu izmaiņas nav saglabātas"
+                { !newArticle ?
+                  (isSaved ? "Jūsu izmaiņas ir saglabātas un publiski pieejamas" : "Jūsu izmaiņas nav saglabātas") : ""
                 }
               </div>
             </div>

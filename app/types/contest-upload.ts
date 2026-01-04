@@ -13,6 +13,7 @@ export interface UploadTeamData{
   teamId?: number;
   solvedProblems: number;
   penalty: number;
+  official: boolean;
 };
 
 export interface UploadSubmissionData{

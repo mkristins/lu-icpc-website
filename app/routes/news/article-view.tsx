@@ -32,7 +32,7 @@ export default function ArticleView({loaderData} : Route.ComponentProps){
               Rediģēt!
             </Link>
           </AdminWrap>
-          <NewsEditor articleJson={loaderData.article.text} articleTitle={loaderData.article.title} isEditable={false} onSave={(t : UploadArticle) => {}} saveTitle=""/>
+          <NewsEditor articleJson={loaderData.article.text} newArticle={false} articleTitle={loaderData.article.title} isEditable={false} onSave={(t : UploadArticle) => {}} saveTitle=""/>
         </div>
   }
 }

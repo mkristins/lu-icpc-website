@@ -5,6 +5,7 @@ import type { Route } from "./+types/article-upload";
 import { isAuthorized } from "~/auth.server";
 import type { UploadArticle } from "~/types/content";
 import { createNewsArticle } from "~/db.server";
+import { uploadAlbumImage } from "~/files.server";
 
 export function loader({request} : Route.LoaderArgs){
     if(!isAuthorized(request)){
@@ -31,10 +32,24 @@ export async function action({request} : {request : Request}){
     if(!isAuthorized(request)){
         return redirect("/")
     }
-    const json = await request.json();
-    const article = json.article
-    await createNewsArticle(article.title, article.jsonBody)
-    redirect("/news")
+    const contentType = request.headers.get("content-type") || "";
+    if(contentType.includes("multipart/form-data")){
+      const form = await request.formData();
+      const image = form.get("img");
+      if(!(image instanceof File)){
+        return "/"
+      }
+      const imgUrl = await uploadAlbumImage(image)
+      return {
+        imgUrl : `${process.env.STORAGE_URL!}/${imgUrl}`
+      }
+    }
+    else{
+      const json = await request.json();
+      const article = json.article
+      await createNewsArticle(article.title, article.jsonBody)
+      return redirect("/news")
+    }
 }
 
 export default function ArticleUpload(){
@@ -49,6 +64,6 @@ export default function ArticleUpload(){
     }
     return <div>
             <Header />
-            <NewsEditor articleJson={JSON.stringify(BASE_DOC)} articleTitle="Paraugs" isEditable={true} onSave={onSave} saveTitle="Publicēt!"/>
+            <NewsEditor articleJson={JSON.stringify(BASE_DOC)} newArticle={true} articleTitle="Paraugs" isEditable={true} onSave={onSave} saveTitle="Publicēt!"/>
           </div>
 }

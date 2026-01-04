@@ -11,6 +11,7 @@ import { updateNewsArticle } from "~/db.server";
 import NewsEditor from "~/components/news-editor";
 import { isAuthorized } from "~/auth.server";
 import type { UploadArticle } from "~/types/content";
+import { uploadAlbumImage } from "~/files.server";
 
 export async function loader({request, params} : Route.LoaderArgs){ 
   const isAdmin = isAuthorized(request)
@@ -31,7 +32,18 @@ export async function action({
   if(!isAdmin){
     throw new Response("Unauthorized", {status: 401})
   }
-
+  const contentType = request.headers.get("content-type") || "";
+  if(contentType.includes("multipart/form-data")){
+    const form = await request.formData();
+    const image = form.get("img");
+    if(!(image instanceof File)){
+      return "/"
+    }
+    const imgUrl = await uploadAlbumImage(image)
+    return {
+      imgUrl : `${process.env.STORAGE_URL!}/${imgUrl}`
+    }
+  }
   const json = await request.json()
   const articleId = json.articleId
   const article = json.article
@@ -65,7 +77,7 @@ export default function ArticleEdit({loaderData} : Route.ComponentProps){
             <Link to={`/news/${loaderData.article.id}`} className="font-bold text-blue-500 text-2xl m-8">
               Apskatīt!
             </Link>
-            <NewsEditor articleJson={loaderData.article.text} articleTitle={loaderData.article.title} isEditable={true} onSave={onSave} saveTitle="Saglabāt"/>
+            <NewsEditor articleJson={loaderData.article.text} newArticle={false} articleTitle={loaderData.article.title} isEditable={true} onSave={onSave} saveTitle="Saglabāt"/>
           </div>
     }
 }
