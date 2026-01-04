@@ -6,6 +6,6 @@ export default function ArticleLink({title, date, articleId} : {title : string, 
             to={`./${articleId}`}
         >
         <div className="font-bold text-xl text-blue-500"> {title} </div>
-        <div className="text-xl"> {date.toDateString()} </div>
+        <div className="text-xl"> {date.toISOString().split('T')[0]} </div>
     </Link>
 }
