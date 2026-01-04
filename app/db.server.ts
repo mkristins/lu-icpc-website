@@ -37,13 +37,14 @@ export async function updateNewsArticle(id: string, newTitle : string,  newText 
 }
 
 export async function createNewsArticle(title : string, text : string){
-    await prisma.newsArticle.create({
+    const article = await prisma.newsArticle.create({
         data : {
             title: title,
             text: text,
             date: new Date()
         }
     })
+    return article.id
 }
 
 export async function fetchAllContests(){
@@ -544,6 +545,7 @@ export async function uploadAlbum(title : string, files : File[]){
             }
         })
     }
+    return album.id
 }
 
 export async function fetchAlbum(id : number){

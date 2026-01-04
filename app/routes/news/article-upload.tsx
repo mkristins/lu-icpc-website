@@ -47,8 +47,8 @@ export async function action({request} : {request : Request}){
     else{
       const json = await request.json();
       const article = json.article
-      await createNewsArticle(article.title, article.jsonBody)
-      return redirect("/news")
+      const articleId = await createNewsArticle(article.title, article.jsonBody)
+      return redirect(`/news/${articleId}`)
     }
 }
 

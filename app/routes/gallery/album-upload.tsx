@@ -28,9 +28,9 @@ export async function action({request} : ActionFunctionArgs){
 
 	const imgList = files as File[];
 
-	await uploadAlbum(title, imgList)
+	const albumId = await uploadAlbum(title, imgList)
 
- 	return redirect("/gallery")
+ 	return redirect(`/gallery/${albumId}`)
 }
 
 
