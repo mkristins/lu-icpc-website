@@ -20,10 +20,6 @@ export default function Home({loaderData} : Route.ComponentProps) {
   return <div>
     <Header />
     <Section
-      title="Jaunumi"
-      content={[]}
-    />
-    <Section
       title="Sacensību norise"
       content={[
         "Tradicionāli šīs programmēšanas sacensības norisinās 5 stundas, savstarpēji sacenšoties 3 cilvēku komandām. Par katru atrisināto uzdevumu komanda saņem 1 punktu, kā arī soda minūtes. Sacensības uzvar komanda ar visvairāk punktiem, bet ja ir vairākas tādas, tad komanda ar vismazāk soda minūtēm."

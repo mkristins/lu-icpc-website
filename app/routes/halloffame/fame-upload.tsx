@@ -38,7 +38,6 @@ export async function action({request} : {request : Request}) {
 export default function FameUpload({loaderData} : Route.ComponentProps){
 
     const fetcher = useFetcher()
-
     const [teamInfo, setTeamInfo] = useState<TeamInfo[]>([
         {
             contextId: 1,
@@ -209,9 +208,9 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
         }))
     }
 
-    function onTeamMedalChange(index : number){
+    function onTeamMedalChange(index : number, contextId : number){
         setTeamInfo(teamInfo.map((team) => {
-            if(team.contextId == editingId){
+            if(team.contextId == contextId){
                 return {...team, medalIndex: index}
             }
             else{
@@ -334,7 +333,7 @@ export default function FameUpload({loaderData} : Route.ComponentProps){
                                     />
                                 </td>
                                 <td className="px-3 py-2 border">
-                                    <MedalSelect index={team.medalIndex} onFocus={() => setEditingId(team.contextId)} onChange={onTeamMedalChange}/>
+                                    <MedalSelect index={team.medalIndex} onFocus={() => setEditingId(team.contextId)} onChange={(index : number) => onTeamMedalChange(index, team.contextId)}/>
                                 </td>
                                 <td className="px-3 py-2 border text-xs text-slate-900">
                                     <button
