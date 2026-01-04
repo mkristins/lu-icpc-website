@@ -13,6 +13,7 @@ import ContestantSearchCell from "~/components/contestant-search";
 import { CellHighlighting, RowHighlighting } from "~/components/table-colors";
 import {DayPicker} from "react-day-picker";
 import "react-day-picker/style.css";
+import DatLoader from "~/components/dat-loader";
 
 export async function loader({request} : {request : Request}){
     if(isAuthorized(request)){
@@ -107,7 +108,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
     }
     // we work with local id's
     function computeSubmissionList(fetchData : CFAPIResponse) : UploadSubmissionData[]{
-        if(!fetchData) return []
+        if(!fetchData || !fetchData.submissions) return []
         return fetchData.submissions.result.map((sub) => {
             return {
                 participantId : sub.author.participantId,
@@ -119,23 +120,39 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
     }
 
     function computeProblemList(fetchData : CFAPIResponse) : string[]{
-        if(!fetchData) return []
+        if(!fetchData || !fetchData.results || !fetchData.results.result) return []
         return fetchData.results.result.problems.map(prob => prob.index)
     }
 
     const fetcher = useFetcher()
     const [teamList, setTeamList] = useState<UploadTeamData[]>([])
     const [editingId, setEditingId] = useState<number | null>(null)
-    const problemList = computeProblemList(fetcher.data)
-    const submissionList = computeSubmissionList(fetcher.data)
+    const [problems, setProblems] = useState<string[]>([])
+    const [submissions, setSubmissions] = useState<UploadSubmissionData[]>([])
+
+
+    useEffect(() => {
+        if(useCodeforcesLoad){
+            console.log(fetcher.data)
+            setProblems(computeProblemList(fetcher.data))
+            setSubmissions(computeSubmissionList(fetcher.data))
+            setTeamList(computeTeamList(fetcher.data))
+        }
+    }, [fetcher.data])
+
+    function updateFromDat(parsedTeamList : UploadTeamData[], parsedSubmissions : UploadSubmissionData[], parsedProblems : string[]){
+        setProblems(parsedProblems)
+        setTeamList(parsedTeamList)
+        setSubmissions(parsedSubmissions)
+    }
 
     function submitUpdates(){
         const formData = new FormData();
         formData.append("intent", "save")
         formData.append("contestName", title)
         formData.append("teams", JSON.stringify(teamList))
-        formData.append("submissions", JSON.stringify(submissionList))
-        formData.append("problems", JSON.stringify(problemList))
+        formData.append("submissions", JSON.stringify(submissions))
+        formData.append("problems", JSON.stringify(problems))
         formData.append("date", date.toISOString())
         if(pdfFile)
             formData.append("pdf", pdfFile)
@@ -162,10 +179,6 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
             }
         )
     }
-
-    useEffect(() => {
-        setTeamList(computeTeamList(fetcher.data))
-    }, [fetcher.data])
 
     function selectTeam(t : TeamSelect){
         setTeamList(teamList.map((team) => {
@@ -237,13 +250,25 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
 
     function setTeamOfficialStatus(participantId : number, official : boolean){
         setTeamList(teamList.map((team) => {
-            if(team.participantId == editingId){
+            if(team.participantId == participantId){
                 return {...team, official: official}
             }
             else{
                 return team
             }
         }))
+    }
+
+    function removeTeam(participantId : number, teamRank : number){
+        setTeamList(teamList.filter((team) => team.participantId != participantId).map((team) => {
+            if(team.rank > teamRank){
+                return {...team, rank: team.rank - 1}
+            }
+            else{
+                return team
+            }
+        }))
+        setSubmissions(submissions.filter((submission) => submission.participantId != participantId))
     }
 
     function onTypeContestant(name : string, index : number){
@@ -280,6 +305,9 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
     const [apiKey, setApiKey] = useState("")
     const [apiSecret, setApiSecret] = useState("")
     const [contestNumber, setContestNumber] = useState("")
+
+    const [useCodeforcesLoad, setUseCodeforcesLoad] = useState(false)
+
     return <div>
         <Header />
         <div className="m-8">
@@ -298,15 +326,30 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                     required={true}
                />
             </Form>
-            <div className="flex flex-col">
-                <div className="flex font-bold"> Dati ielāde no "Codeforces" </div>
-                <NewInputComponent value={apiKey} placeholder="Codeforces API atslēga" setValue={setApiKey}/>
-                <NewInputComponent value={apiSecret} placeholder="Codeforces API noslēpums" setValue={setApiSecret}/>
-                <NewInputComponent value={contestNumber} placeholder="Codeforces sacensību ID" setValue={setContestNumber}/>
-                <button onClick={requestCodeforcesData} className="border bg-slate-900 hover:bg-slate-800 w-48 h-10 rounded-xl text-white text-sm m-2">
-                    Ielādēt no Codeforces!
-                </button>
+            <div>
+                {
+                    !useCodeforcesLoad ? <button className="mx-2" onClick={() => setUseCodeforcesLoad(true)}>Codeforces</button> :
+                    <button className="mx-2 px-3 py-2 bg-slate-900 text-white hover:bg-slate-700 rounded-xl" onClick={() => setUseCodeforcesLoad(true)}>Codeforces</button>
+                }
+                {
+                    useCodeforcesLoad ? <button className="mx-2" onClick={() => setUseCodeforcesLoad(false)}>DAT fails</button> :
+                    <button className="mx-2 px-3 py-2 bg-slate-900 text-white hover:bg-slate-700 rounded-xl" onClick={() => setUseCodeforcesLoad(false)}>DAT fails</button>
+                }
             </div>
+            {useCodeforcesLoad &&
+                <div className="flex flex-col">
+                    <div className="flex font-bold"> Dati ielāde no "Codeforces" </div>
+                    <NewInputComponent value={apiKey} placeholder="Codeforces API atslēga" setValue={setApiKey}/>
+                    <NewInputComponent value={apiSecret} placeholder="Codeforces API noslēpums" setValue={setApiSecret}/>
+                    <NewInputComponent value={contestNumber} placeholder="Codeforces sacensību ID" setValue={setContestNumber}/>
+                    <button onClick={requestCodeforcesData} className="border bg-slate-900 hover:bg-slate-800 w-48 h-10 rounded-xl text-white text-sm m-2">
+                        Ielādēt no Codeforces!
+                    </button>
+                </div>
+            }
+            {!useCodeforcesLoad &&
+                <DatLoader onLoad={updateFromDat}/>
+            }
             <div>
                 Komandas
             </div>
@@ -321,6 +364,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                         <th className="border px-3 py-2 text-left"> Punkti </th>
                         <th className="border px-3 py-2 text-left"> Soda minūtes </th>
                         <th className="border px-3 py-2 text-left"> Officiāla? </th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -373,6 +417,9 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                                         onChange={(e) => setTeamOfficialStatus(team.participantId, e.target.checked)} 
                                         type="checkbox"
                                     />
+                                </td>
+                                <td className="border px-3 py-2">
+                                    <button onClick={(e) => removeTeam(team.participantId, team.rank)} className="text-xs">Noņemt</button>
                                 </td>
                             </RowHighlighting>
                         })

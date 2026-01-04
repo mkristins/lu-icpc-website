@@ -6,7 +6,7 @@ import { isAuthorized } from "~/auth.server";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "LUPO" },
-    { name: "description", content: "Welcome to React Router!" },
+    { name: "description", content: "LUPO" },
   ];
 }
 
