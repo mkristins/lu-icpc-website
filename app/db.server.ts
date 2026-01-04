@@ -271,7 +271,7 @@ export async function uploadLocalContest(
     date: Date
 ){
     const pdfUrl = await uploadPDF(pdfFile);
-    
+    console.log("PDF file uploaded successfully")
     const dbContest = await prisma.contest.create({
         data: {
             name: contestName,
@@ -280,6 +280,7 @@ export async function uploadLocalContest(
             date : date
         }
     })
+    console.log("Contest created successfully")
 
     const dbProblems = await Promise.all(
         problems.map(async p => {

@@ -38,15 +38,16 @@ export async function action({request} : {request : Request}){
 
         if (intent === "save") {
             const contestName = String(form.get("contestName") || "");
-            const year = Number(form.get("year") || 0);
             const teams = JSON.parse(String(form.get("teams") || "[]"));
             const problems = JSON.parse(String(form.get("problems") || "[]"));
             const submissions = JSON.parse(String(form.get("submissions") || "[]"));
             const date = new Date(String(form.get("date")))
             const pdf = form.get("pdf"); // File | null
+            console.log("Intent is to save")
             if (!(pdf instanceof File) || pdf.size === 0) {
                 return {}
             }
+            console.log("Upload the local contest")
             await uploadLocalContest(
                 contestName,
                 teams,
