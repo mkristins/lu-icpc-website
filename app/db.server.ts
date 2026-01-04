@@ -314,43 +314,73 @@ export async function uploadLocalContest(
                     }
                 })
                 if(t.member1.name){
-                    const contestant1 = await prisma.contestant.create({
-                        data : {
-                            name: t.member1.name
-                        }
-                    })
-                    await prisma.teamMember.create({
-                        data : {
-                            teamId: dbTeam.id,
-                            contestantId: contestant1.id
-                        }
-                    })
+                    if(t.member1.contestantId){
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: t.member1.contestantId
+                            }
+                        })
+                    }
+                    else{
+                        const contestant1 = await prisma.contestant.create({
+                            data : {
+                                name: t.member1.name
+                            }
+                        })
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: contestant1.id
+                            }
+                        })
+                    }
                 }
                 if(t.member2.name){
-                    const contestant2 = await prisma.contestant.create({
-                        data : {
-                            name: t.member2.name
-                        }
-                    })
-                    await prisma.teamMember.create({
-                        data : {
-                            teamId: dbTeam.id,
-                            contestantId: contestant2.id
-                        }
-                    })
+                    if(t.member2.contestantId){
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: t.member2.contestantId
+                            }
+                        })
+                    }
+                    else{
+                        const contestant2 = await prisma.contestant.create({
+                            data : {
+                                name: t.member2.name
+                            }
+                        })
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: contestant2.id
+                            }
+                        })
+                    }
                 }
                 if(t.member3.name){
-                    const contestant3 = await prisma.contestant.create({
-                        data : {
-                            name: t.member3.name
-                        }
-                    })
-                    await prisma.teamMember.create({
-                        data : {
-                            teamId: dbTeam.id,
-                            contestantId: contestant3.id
-                        }
-                    })
+                    if(t.member3.contestantId){
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: t.member3.contestantId
+                            }
+                        })
+                    }
+                    else{
+                        const contestant3 = await prisma.contestant.create({
+                            data : {
+                                name: t.member3.name
+                            }
+                        })
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: contestant3.id
+                            }
+                        })
+                    }
                 }
                 await prisma.teamParticipation.create({
                     data : {
@@ -414,43 +444,73 @@ export async function uploadContestSuccess(teamInfo : TeamInfo[], date : Date, c
                     }
                 })
                 if(t.member1.name){
-                    const contestant1 = await prisma.contestant.create({
-                        data : {
-                            name: t.member1.name
-                        }
-                    })
-                    await prisma.teamMember.create({
-                        data : {
-                            teamId: dbTeam.id,
-                            contestantId: contestant1.id
-                        }
-                    })
+                    if(t.member1.id){
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: t.member1.id
+                            }
+                        })
+                    }
+                    else{
+                        const contestant1 = await prisma.contestant.create({
+                            data : {
+                                name: t.member1.name
+                            }
+                        })
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: contestant1.id
+                            }
+                        })
+                    }
                 }
                 if(t.member2.name){
-                    const contestant2 = await prisma.contestant.create({
-                        data : {
-                            name: t.member2.name
-                        }
-                    })
-                    await prisma.teamMember.create({
-                        data : {
-                            teamId: dbTeam.id,
-                            contestantId: contestant2.id
-                        }
-                    })
+                    if(t.member2.id){
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: t.member2.id
+                            }
+                        })
+                    }
+                    else{
+                        const contestant2 = await prisma.contestant.create({
+                            data : {
+                                name: t.member2.name
+                            }
+                        })
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: contestant2.id
+                            }
+                        })
+                    }
                 }
                 if(t.member3.name){
-                    const contestant3 = await prisma.contestant.create({
-                        data : {
-                            name: t.member3.name
-                        }
-                    })
-                    await prisma.teamMember.create({
-                        data : {
-                            teamId: dbTeam.id,
-                            contestantId: contestant3.id
-                        }
-                    })
+                    if(t.member3.id){
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: t.member3.id
+                            }
+                        })
+                    }
+                    else{
+                        const contestant3 = await prisma.contestant.create({
+                            data : {
+                                name: t.member3.name
+                            }
+                        })
+                        await prisma.teamMember.create({
+                            data : {
+                                teamId: dbTeam.id,
+                                contestantId: contestant3.id
+                            }
+                        })
+                    }
                 }
                 await prisma.teamParticipation.create({
                     data : {

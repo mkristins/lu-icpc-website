@@ -5,8 +5,8 @@ import { Link } from "react-router"
 import { MedalTypes } from "~/types/medals"
 
 export async function loader({params} : Route.LoaderArgs){
-    const teamId = params.id
-    const constestant = await fetchContestantProfile(parseInt(teamId))
+    const contestantId = params.id
+    const constestant = await fetchContestantProfile(parseInt(contestantId))
     return constestant
 }
 
@@ -23,7 +23,7 @@ export default function ContestantProfile({loaderData} : Route.ComponentProps){
     const participationList = loaderData.teams.flatMap(
         (team) => {
             return team.team.participations.map((participation) => {
-                return {
+                                return {
                     teamName: team.team.name,
                     ...participation,
                 }
