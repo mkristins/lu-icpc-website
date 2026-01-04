@@ -73,7 +73,7 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
                       <td className="px-3 py-2 border bg-amber-400">{team.gold}</td>
                       <td className="px-3 py-2 border bg-slate-500">{team.silver}</td>
                       <td className="px-3 py-2 border bg-red-900">{team.bronze}</td>
-                      <td className="px-3 py-2 border">{team.participations}</td>
+                      <td className="px-3 py-2 border">{team.gold + team.silver + team.bronze}</td>
                     </tr>
                   })
                 }
@@ -103,7 +103,7 @@ export default function HallOfFame({loaderData} : Route.ComponentProps) {
                   <td className="px-3 py-2 border bg-amber-400">{contestant.gold}</td>
                   <td className="px-3 py-2 border bg-slate-500">{contestant.silver}</td>
                   <td className="px-3 py-2 border bg-red-900">{contestant.bronze}</td>
-                  <td className="px-3 py-2 border">{contestant.participations}</td>
+                  <td className="px-3 py-2 border">{contestant.gold + contestant.silver + contestant.bronze}</td>
                 </tr>
               })
             }
