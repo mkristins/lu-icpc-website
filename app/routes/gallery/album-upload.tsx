@@ -13,6 +13,9 @@ export async function loader({request} : Route.LoaderArgs) {
 }
 
 export async function action({request} : ActionFunctionArgs){
+	if(!isAuthorized(request)){
+        return redirect("/")
+    }
 	const formData = await request.formData();
 	const title = formData.get("title")
 	const files = formData.getAll("img");

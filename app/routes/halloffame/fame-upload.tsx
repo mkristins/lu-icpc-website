@@ -25,6 +25,9 @@ export async function loader({request} : Route.LoaderArgs){
 }
 
 export async function action({request} : {request : Request}) {
+    if(!isAuthorized(request)){
+        return redirect("/")
+    }
     const json = await request.json()
 
     const teams = json.teamInfo

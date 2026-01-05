@@ -31,6 +31,9 @@ export async function loader({request} : {request : Request}){
 }
 
 export async function action({request} : {request : Request}){
+    if(!isAuthorized(request)){
+        return redirect("/")
+    }
     const contentType = request.headers.get("content-type") || "";
     if(contentType.includes("multipart/form-data")){
         const form = await request.formData();
@@ -149,6 +152,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
 
     function submitUpdates(){
         const formData = new FormData();
+
         formData.append("intent", "save")
         formData.append("contestName", title)
         formData.append("teams", JSON.stringify(teamList))
@@ -315,7 +319,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
             <div className="text-2xl font-bold">
                 Sacensību ielāde
             </div>
-            <Form className="flex flex-col">
+            <div className="flex flex-col">
                 <InputComponent name="contestName" placeholder="Sacensību nosaukums" value={title} setValue={setTitle} /> 
                 <PdfUploader onChange={setPdfFile}/>
                 <div className="font-bold text-xl"> Izvēlieties datumu! </div>
@@ -326,7 +330,7 @@ export default function UploadContest({loaderData} : Route.ComponentProps) {
                     onSelect={setDate}
                     required={true}
                />
-            </Form>
+            </div>
             <div>
                 {
                     !useCodeforcesLoad ? <button className="mx-2" onClick={() => setUseCodeforcesLoad(true)}>Codeforces</button> :
