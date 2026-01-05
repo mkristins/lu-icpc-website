@@ -49,6 +49,7 @@ export async function uploadPDF(file : File) {
     const client = new S3Client({
         region: "auto",
         endpoint: process.env.S3_URL!,
+        logger: console,
         credentials: {
             accessKeyId: process.env.S3_ACCESS_KEY!,
             secretAccessKey: process.env.S3_SECRET_KEY!
