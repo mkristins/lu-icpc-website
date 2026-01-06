@@ -2,6 +2,8 @@ import type { Route } from "./+types/home";
 import Section from "../shared/section";
 import Header from "../shared/header";
 import { isAuthorized } from "~/auth.server";
+import { redirect, useFetcher } from "react-router";
+import AdminWrap from "~/components/admin-wrap";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -16,9 +18,21 @@ export async function loader({request} : {request : Request}) {
   }
 }
 
+export async function action() {
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": "token=; HttpOnly; Secure; Path=/; SameSite=Strict; Max-Age=0"
+    },
+  });
+}
+
 export default function Home({loaderData} : Route.ComponentProps) {
+  const fetcher = useFetcher()
   return <div>
     <Header />
+    <AdminWrap isAdmin={loaderData.isAdmin}>
+      <button onClick={() => fetcher.submit({}, {method: "post"})} className="border w-32 m-2 p-1 rounded"> Atteikties </button>
+    </AdminWrap>
     <Section
       title="Sacensību norise"
       content={[
